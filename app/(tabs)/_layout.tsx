@@ -39,8 +39,27 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions = {
       {
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
+        
+        tabBarActiveTintColor: '#FFC107', 
+    tabBarInactiveTintColor: '#FFFFFF', 
+    tabBarStyle: {
+      backgroundColor: '#9748FF', 
+      height: 65, 
+      marginHorizontal: 20, 
+      borderRadius: 20, 
+      position: 'absolute', 
+      bottom: 20, 
+      shadowColor: '#000', 
+      shadowOpacity: 0.1,
+      shadowRadius: 10,
+      elevation: 5, 
+    },
+    tabBarLabelStyle: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      paddingBottom: 5,
+    },
+    headerShown: false
       }
     }>
       <Tabs.Screen name="(home)" options={homeOptions}/>
