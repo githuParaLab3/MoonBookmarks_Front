@@ -9,7 +9,7 @@ export function AudiovisualSreen() {
   return (
     <ThemedView style={styles.container}>   
 
-      <ThemedText>Hello</ThemedText>
+      <ThemedText>Audiovisual</ThemedText>
 
     </ThemedView>
   );

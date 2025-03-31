@@ -9,7 +9,7 @@ export function HomeScreen() {
   return (
     <ThemedView style={styles.container}>   
 
-      <ThemedText>Hello</ThemedText>
+      <ThemedText>Home</ThemedText>
 
     </ThemedView>
   );

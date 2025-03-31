@@ -9,7 +9,7 @@ export function ComicsScreen() {
   return (
     <ThemedView style={styles.container}>   
 
-      <ThemedText>Hello</ThemedText>
+      <ThemedText>Comics</ThemedText>
 
     </ThemedView>
   );

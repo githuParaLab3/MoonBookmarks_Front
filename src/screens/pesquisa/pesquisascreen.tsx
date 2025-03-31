@@ -9,7 +9,7 @@ export function PesquisaScreen() {
   return (
     <ThemedView style={styles.container}>   
 
-      <ThemedText>Hello</ThemedText>
+      <ThemedText>Pesquisa</ThemedText>
 
     </ThemedView>
   );

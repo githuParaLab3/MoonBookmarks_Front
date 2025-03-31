@@ -9,7 +9,7 @@ export function LivrosScreen() {
   return (
     <ThemedView style={styles.container}>   
 
-      <ThemedText>Hello</ThemedText>
+      <ThemedText>Livros</ThemedText>
 
     </ThemedView>
   );
