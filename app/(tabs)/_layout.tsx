@@ -1,72 +1,95 @@
-import { Colors } from '@/src/constants/Colors';
-import IconSymbol,{IconColor} from '@/src/components/iconsymbol';
+import { View, StyleSheet } from 'react-native';
+import HeaderScreen from '@/src/components/HeaderScreen'; // Importa o header
+import IconSymbol, { IconColor } from '@/src/components/iconsymbol';
 import { Tabs } from 'expo-router';
-import { useColorScheme } from 'react-native';
 
 type TabIconProps = {
-  color:IconColor,
-}
+  color: IconColor;
+};
 
 export default function TabLayout() {
-
-  const colorScheme = useColorScheme();
-
-  const homeOptions = { 
-    title:"Home",
-    tabBarIcon: ({color}:TabIconProps) => <IconSymbol size={28} name="house.fill" color={color} />
-  }
-
-  const pesquisaOptions = {
-    title:"Pesquisa",
-    tabBarIcon: ({color}:TabIconProps) => <IconSymbol size={28} name="magnifyingglass" color={color} />
-  }
-
-  const comicsOptions = {
-    title:"Comics",
-    tabBarIcon: ({color}:TabIconProps) => <IconSymbol size={28} name="paintbrush" color={color} />
-  }
-
-  const livrosOptions = {
-    title:"Livros",
-    tabBarIcon: ({color}:TabIconProps) => <IconSymbol size={28} name="book.fill" color={color} />
-  }
-
-  const audiovisualOptions = {
-    title:"Audiovisual",
-    tabBarIcon: ({color}:TabIconProps) => <IconSymbol size={28} name="film" color={color} />
-  }
-
   return (
-    <Tabs screenOptions = {
-      {
-        
-        tabBarActiveTintColor: '#FFC107', 
-    tabBarInactiveTintColor: '#FFFFFF', 
-    tabBarStyle: {
-      backgroundColor: '#9748FF', 
-      height: 65, 
-      marginHorizontal: 20, 
-      borderRadius: 20, 
-      position: 'absolute', 
-      bottom: 20, 
-      shadowColor: '#000', 
-      shadowOpacity: 0.1,
-      shadowRadius: 10,
-      elevation: 5, 
-    },
-    tabBarLabelStyle: {
-      fontSize: 14,
-      fontWeight: 'bold',
-      paddingBottom: 5,
-    },
-    headerShown: false
-      }
-    }>
-      <Tabs.Screen name="(home)" options={homeOptions}/>
-      <Tabs.Screen name="(pesquisa)" options={pesquisaOptions}/>
-      <Tabs.Screen name="(comics)" options={comicsOptions}/>
-      <Tabs.Screen name="(livros)" options={livrosOptions}/>
-      <Tabs.Screen name="(audiovisual)" options={audiovisualOptions}/>
-    </Tabs>
+    <View style={{ flex: 1 }}>
+      <HeaderScreen />
+      
+      <View style={{ flex: 1 }}> 
+        <Tabs
+          screenOptions={{
+            tabBarActiveTintColor: '#FFC107',
+            tabBarInactiveTintColor: '#FFFFFF',
+            tabBarStyle: styles.tabBar,
+            tabBarLabelStyle: styles.tabBarLabel,
+            headerShown: false, 
+          }}
+        >
+          <Tabs.Screen
+            name="(home)"
+            options={{
+              title: 'Home',
+              tabBarIcon: ({ color }: TabIconProps) => (
+                <IconSymbol size={28} name="house.fill" color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(pesquisa)"
+            options={{
+              title: 'Pesquisa',
+              tabBarIcon: ({ color }: TabIconProps) => (
+                <IconSymbol size={28} name="magnifyingglass" color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(comics)"
+            options={{
+              title: 'Comics',
+              tabBarIcon: ({ color }: TabIconProps) => (
+                <IconSymbol size={28} name="paintbrush" color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(livros)"
+            options={{
+              title: 'Livros',
+              tabBarIcon: ({ color }: TabIconProps) => (
+                <IconSymbol size={28} name="book.fill" color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(audiovisual)"
+            options={{
+              title: 'Audiovisual',
+              tabBarIcon: ({ color }: TabIconProps) => (
+                <IconSymbol size={28} name="film" color={color} />
+              ),
+            }}
+          />
+        </Tabs>
+      </View>
+    </View>
   );
 }
+
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: '#9748FF',
+    height: 65,
+    marginHorizontal: 10,
+    position: 'absolute',
+    bottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+    paddingBottom: 10,
+  },
+  tabBarLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    paddingBottom: 5,
+  },
+});
