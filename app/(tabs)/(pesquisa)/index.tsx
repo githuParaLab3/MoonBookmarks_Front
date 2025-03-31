@@ -1,8 +1,8 @@
-import { ThemedText } from "@/src/components/ThemedText";
-import HomeScreen from "@/src/screens/home";
+
+import { PesquisaScreen } from "@/src/screens/pesquisa/pesquisascreen";
 
 export default function Index() {
   return (
-    <ThemedText>Tela de Pesquisa</ThemedText>
+    <PesquisaScreen/>
   );
 }
