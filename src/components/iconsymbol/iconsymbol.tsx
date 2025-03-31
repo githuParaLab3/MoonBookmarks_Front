@@ -9,6 +9,11 @@ const MAPPING = {
   // See SF Symbols in the SF Symbols app on Mac.
   'house.fill': 'home',
   'gear': 'settings',
+  'magnifyingglass': 'search',
+  'film': 'movie',
+  'book.fill': 'library-books',
+  'paintbrush': 'brush'
+  
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],
