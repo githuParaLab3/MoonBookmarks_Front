@@ -1,5 +1,5 @@
 import { Colors } from '@/src/constants/Colors';
-import IconSymbol,{IconColor} from '@/src/cp/iconsymbol';
+import IconSymbol,{IconColor} from '@/src/components/iconsymbol';
 import { Tabs } from 'expo-router';
 import { useColorScheme } from 'react-native';
 

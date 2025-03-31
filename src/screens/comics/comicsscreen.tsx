@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import { useState } from "react";
 import { ThemedText } from "@/src/components/ThemedText";
 
-export function HomeScreen() {
+export function ComicsScreen() {
 
   return (
     <ThemedView style={styles.container}>   
