@@ -2,8 +2,7 @@ import { Button } from "@/src/cp/Button";
 import { ThemedView } from "@/src/cp/ThemedView";
 import { StyleSheet } from 'react-native';
 import { useState } from "react";
-import RegisterScreen from "../register";
-import UserListScreen from "../userlist";
+import { ThemedText } from "@/src/cp/ThemedText";
 
 export function HomeScreen() {
   
@@ -16,15 +15,7 @@ export function HomeScreen() {
   return (
     <ThemedView style={styles.container}>   
 
-       <ThemedView style={styles.content}>
-          <UserListScreen />
-       </ThemedView>
-
-       <ThemedView style={styles.footerContainer}>
-          <Button theme="primary" label="Perfil de Usuário" onPress={()=>setIsModalVisible(true)} />
-       </ThemedView>
-
-      <RegisterScreen visible={isModalVisible} handleClose={onModalClose} />
+      <ThemedText>Hello</ThemedText>
 
     </ThemedView>
   );

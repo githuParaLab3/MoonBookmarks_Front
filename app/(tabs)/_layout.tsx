@@ -16,8 +16,23 @@ export default function TabLayout() {
     tabBarIcon: ({color}:TabIconProps) => <IconSymbol size={28} name="house.fill" color={color} />
   }
 
-  const settingOptions = {
-    title:"Settings",
+  const pesquisaOptions = {
+    title:"Pesquisa",
+    tabBarIcon: ({color}:TabIconProps) => <IconSymbol size={28} name="gear" color={color} />
+  }
+
+  const comicsOptions = {
+    title:"Comics",
+    tabBarIcon: ({color}:TabIconProps) => <IconSymbol size={28} name="gear" color={color} />
+  }
+
+  const livrosOptions = {
+    title:"Livros",
+    tabBarIcon: ({color}:TabIconProps) => <IconSymbol size={28} name="gear" color={color} />
+  }
+
+  const audiovisualOptions = {
+    title:"Audiovisual",
     tabBarIcon: ({color}:TabIconProps) => <IconSymbol size={28} name="gear" color={color} />
   }
 
@@ -29,7 +44,10 @@ export default function TabLayout() {
       }
     }>
       <Tabs.Screen name="(home)" options={homeOptions}/>
-      <Tabs.Screen name="settings" options={settingOptions}/>
+      <Tabs.Screen name="(pesquisa)" options={pesquisaOptions}/>
+      <Tabs.Screen name="(comics)" options={comicsOptions}/>
+      <Tabs.Screen name="(livros)" options={livrosOptions}/>
+      <Tabs.Screen name="(audiovisual)" options={audiovisualOptions}/>
     </Tabs>
   );
 }
