@@ -1,11 +1,9 @@
-
 import { ThemedView } from "@/src/components/ThemedView";
 import { StyleSheet, TextInput, FlatList, View, Text, ActivityIndicator, Button } from 'react-native';
 import { useState, useEffect } from "react";
 import { ThemedText } from "@/src/components/ThemedText";
 import axios from 'axios';
 
-// Definindo a interface para a obra
 interface Obra {
   id: number;
   titulo: string;
@@ -16,47 +14,54 @@ interface Obra {
 }
 
 export function ComicsScreen() {
-  const [obras, setObras] = useState<Obra[]>([]); // Definindo o tipo de obras como uma lista de Obra
-  const [loading, setLoading] = useState(true); // Para mostrar um carregando enquanto busca as obras
+  const [obras, setObras] = useState<Obra[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Função para fazer a requisição GET e obter as obras
   const fetchObras = async () => {
     try {
       const response = await axios.get('https://moonbookmarks-back.onrender.com/obras');
-      setObras(response.data); // Armazena as obras recebidas no estado
-      setLoading(false); // Desativa o carregando
+      setObras(response.data);
+      setLoading(false);
     } catch (error) {
       console.error('Erro ao obter as obras:', error);
-      setLoading(false); // Desativa o carregando
+      setLoading(false);
     }
   };
 
-  // Função para deletar uma obra
   const deleteObra = async (id: number) => {
     try {
-      await axios.delete(`https://moonbookmarks-back.onrender.com/obras/${id}`); // Envia a requisição DELETE
-      setObras(obras.filter(obra => obra.id !== id)); // Remove a obra da lista local
+      await axios.delete(`https://moonbookmarks-back.onrender.com/obras/${id}`);
+      setObras(obras.filter(obra => obra.id !== id));
     } catch (error) {
       console.error('Erro ao deletar a obra:', error);
     }
   };
 
-  // Carrega as obras assim que o componente for montado
   useEffect(() => {
     fetchObras();
-  }, []); // O array vazio [] significa que isso será executado apenas uma vez quando o componente for montado
+  }, []);
+
+  const filteredObras = obras.filter(obra =>
+    obra.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    obra.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    obra.descricao.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <ThemedView style={styles.container}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Pesquisar por título, autor ou descrição"
+        value={searchTerm}
+        onChangeText={setSearchTerm}
+      />
       <ThemedText>Obras</ThemedText>
-
-      {/* Exibe o carregando enquanto a requisição está em andamento */}
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
-        // Exibe a lista de obras quando a requisição for concluída
         <FlatList
-          data={obras}
+          data={filteredObras}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.obraItem}>
@@ -65,24 +70,32 @@ export function ComicsScreen() {
               <Text style={styles.autor}>Autor: {item.autor}</Text>
               <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
               <Text style={styles.generos}>Gêneros: {item.generos.join(', ')}</Text>
-              
-              {/* Botão de Deletar */}
               <Button title="Deletar" onPress={() => deleteObra(item.id)} />
             </View>
           )}
         />
       )}
-
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop:20,
+    paddingTop: 20,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  
+  searchInput: {
+    width: '90%',
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingLeft: 10,
+    marginBottom: 20,
+    marginTop:65
   },
   obraItem: {
     backgroundColor: '#f9f9f9',
