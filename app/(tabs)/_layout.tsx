@@ -9,10 +9,10 @@ type TabIconProps = {
 
 export default function TabLayout() {
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1}}>
       <HeaderScreen />
       
-      <View style={{ flex: 1 }}> 
+      <View style={{ flex: 1}}> 
         <Tabs
           screenOptions={{
             tabBarActiveTintColor: '#FFC107',
@@ -20,6 +20,7 @@ export default function TabLayout() {
             tabBarStyle: styles.tabBar,
             tabBarLabelStyle: styles.tabBarLabel,
             headerShown: false, 
+            
           }}
         >
           <Tabs.Screen

@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 10, 
     paddingTop: 10,
+    height: 80,
   },
   header: {
     backgroundColor: '#9748FF',
