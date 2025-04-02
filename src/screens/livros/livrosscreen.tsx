@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { ThemedText } from "@/src/components/ThemedText";
 import BotaoColecao from "@/src/components/BotaoColecao";
 import axios from "axios";
-
+import HeaderScreen from "@/src/components/HeaderScreen";
 export function LivrosScreen() {
   const [obras, setObras] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,6 +47,7 @@ export function LivrosScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <HeaderScreen />
       <BotaoColecao titulo1="Bookmarks" titulo2="Coleções" />
 
       {loading ? (

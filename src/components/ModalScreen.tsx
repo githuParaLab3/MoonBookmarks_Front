@@ -23,11 +23,6 @@ export default function ModalScreen({ isVisible, children, onClose, title = "Mod
             <View style={styles.titleContainer}>
               <ThemedText type='subtitle'>{title}</ThemedText>
             </View>
-            <View style={styles.titleButton}>
-              <Pressable onPress={onClose}>
-                <MaterialIcons name="close" color="#000" size={22} />
-              </Pressable>
-            </View>
           </View>
           
           <View 

@@ -10,7 +10,6 @@ type TabIconProps = {
 export default function TabLayout() {
   return (
     <View style={{ flex: 1}}>
-      <HeaderScreen />
       
       <View style={{ flex: 1}}> 
         <Tabs

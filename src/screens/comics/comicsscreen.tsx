@@ -4,10 +4,13 @@ import { StyleSheet } from 'react-native';
 import { useState } from "react";
 import { ThemedText } from "@/src/components/ThemedText";
 import BotaoColecao from "@/src/components/BotaoColecao";
+import HeaderScreen from "@/src/components/HeaderScreen";
 export function ComicsScreen() {
 
   return (
     <ThemedView style={styles.container}> 
+
+      <HeaderScreen />
 
       <BotaoColecao titulo1="Bookmarks" titulo2="Coleções" />
   

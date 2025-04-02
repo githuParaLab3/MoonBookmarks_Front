@@ -4,7 +4,7 @@ import { ThemedView } from "@/src/components/ThemedView";
 import { ThemedText } from "@/src/components/ThemedText";
 import { Picker } from "@react-native-picker/picker";
 import axios from "axios";
-import ModalScreen from "@/src/components/ModalScreen";
+import ModalScreen from "@/src/components/ModalScreen"; 
 import FloatingActionButton from "@/src/components/FloatingActionButton";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, Card, Text, Paragraph, TouchableRipple } from "react-native-paper";
@@ -28,6 +28,16 @@ export function PesquisaScreen() {
   const [generoFilter, setGeneroFilter] = useState("");
   const [message, setMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+
+  // Estado para os campos do formulário do modal
+  const [form, setForm] = useState({
+    titulo: "",
+    descricao: "",
+    autor: "",
+    tipo: "",
+    imagem: "",
+    generos: "",
+  });
 
   const fetchObras = async () => {
     try {
@@ -64,12 +74,12 @@ export function PesquisaScreen() {
 
   const criarObra = () => {
     const novaObra = {
-      titulo: "",
-      descricao: "",
-      autor: "",
-      tipo: "",
-      imagem: "",
-      generos: [],
+      titulo: form.titulo,
+      descricao: form.descricao,
+      autor: form.autor,
+      tipo: form.tipo,
+      imagem: form.imagem,
+      generos: form.generos.split(",").map((genero) => genero.trim()),
     };
 
     axios
@@ -78,7 +88,15 @@ export function PesquisaScreen() {
       })
       .then(() => {
         setMessage("Obra criada com sucesso!");
-        setModalVisible(false);
+        setModalVisible(false); // Fechar o modal após criar a obra
+        setForm({
+          titulo: "",
+          descricao: "",
+          autor: "",
+          tipo: "",
+          imagem: "",
+          generos: "",
+        }); // Resetando o formulário
       })
       .catch((error) => {
         console.log(error.response || error.message);
@@ -86,54 +104,65 @@ export function PesquisaScreen() {
       });
   };
 
+  const handleInputChange = (name: string, value: string) => {
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  };
+
   return (
     <ThemedView style={styles.container}>
+     
       <FloatingActionButton onPress={() => setModalVisible(true)} />
 
-      <ModalScreen isVisible={modalVisible} onClose={() => setModalVisible(false)} title="Criar Obra">
-        <View style={styles.formContainer}>
-          
-          <TextInput
-            style={styles.input}
-            placeholder="Título"
-            value=""
-            onChangeText={() => {}}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Descrição"
-            value=""
-            onChangeText={() => {}}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Autor"
-            value=""
-            onChangeText={() => {}}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Tipo (ex: MANGA)"
-            value=""
-            onChangeText={() => {}}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Imagem (URL)"
-            value=""
-            onChangeText={() => {}}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Gêneros (separados por vírgula)"
-            value=""
-            onChangeText={() => {}}
-          />
-          <Button mode="contained" onPress={criarObra}>
-            Criar Obra
-          </Button>
-        </View>
-      </ModalScreen>
+      
+      {modalVisible && (
+        <ModalScreen isVisible={modalVisible} onClose={() => setModalVisible(false)} title="Criar Obra">
+          <View style={styles.formContainer}>
+        
+            <TextInput
+              style={styles.input}
+              placeholder="Título"
+              value={form.titulo}
+              onChangeText={(text) => handleInputChange("titulo", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Descrição"
+              value={form.descricao}
+              onChangeText={(text) => handleInputChange("descricao", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Autor"
+              value={form.autor}
+              onChangeText={(text) => handleInputChange("autor", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Tipo (ex: MANGA)"
+              value={form.tipo}
+              onChangeText={(text) => handleInputChange("tipo", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Imagem (URL)"
+              value={form.imagem}
+              onChangeText={(text) => handleInputChange("imagem", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Gêneros (separados por vírgula)"
+              value={form.generos}
+              onChangeText={(text) => handleInputChange("generos", text)}
+            />
+            <Button style={{backgroundColor:"#9748FF"}} mode="contained" onPress={criarObra}>
+              Criar Obra
+            </Button>
+          </View>
+        </ModalScreen>
+      )}
 
       <View style={styles.searchContainer}>
         <View style={styles.inputContainer}>
@@ -209,7 +238,7 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 16,
   },
-  input: { // Estilo do input corrigido
+  input: {
     height: 40,
     marginBottom: 12,
     borderWidth: 1,
@@ -272,11 +301,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   obraItem: {
-    width: "90%",
-    marginBottom: 10,
     backgroundColor: "#fff",
     borderRadius: 8,
-    elevation: 4,
+    padding: 15,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    width:"100%",
   },
   titulo: {
     fontSize: 18,
@@ -299,7 +333,7 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: 10,
     borderRadius: 5,
-    backgroundColor: "#d32f2f",
+    backgroundColor: "#9748FF",
     alignItems: "center",
     marginTop: 10,
   },
@@ -307,6 +341,4 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-});
-
-export default PesquisaScreen;
+})

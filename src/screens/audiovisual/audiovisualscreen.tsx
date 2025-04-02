@@ -3,6 +3,7 @@ import { ThemedView } from "@/src/components/ThemedView";
 import { StyleSheet } from 'react-native';
 import { useState } from "react";
 import { ThemedText } from "@/src/components/ThemedText";
+import DetalhesBookmarksScreen from "../detalhesbookmarks";
 
 export function AudiovisualSreen() {
 
@@ -10,6 +11,8 @@ export function AudiovisualSreen() {
     <ThemedView style={styles.container}>   
 
       <ThemedText>Audiovisual</ThemedText>
+
+      <DetalhesBookmarksScreen/>
 
     </ThemedView>
   );

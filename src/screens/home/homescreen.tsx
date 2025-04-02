@@ -3,11 +3,13 @@ import { ThemedView } from "@/src/components/ThemedView";
 import { StyleSheet } from 'react-native';
 import { useState } from "react";
 import { ThemedText } from "@/src/components/ThemedText";
+import HeaderScreen from "@/src/components/HeaderScreen";
 
 export function HomeScreen() {
 
   return (
-    <ThemedView style={styles.container}>   
+    <ThemedView style={styles.container}>  
+      <HeaderScreen/> 
 
       <ThemedText>Home</ThemedText>
 
