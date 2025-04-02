@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent:'flex-start',
-    marginTop: 20,
+    marginTop: 70,
     position: 'absolute', // Fixa no topo
     top: 0, // Ajuste fino para ficar abaixo do header
     zIndex: 10, // Mantém acima de outros elementos
@@ -55,14 +55,14 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 10,
-    backgroundColor: '#d3d3d3', // Cor de fundo padrão
+    backgroundColor: '#fff', // Cor de fundo padrão
   },
   botaoAtivo: {
     backgroundColor: '#9748FF', // Cor de fundo quando ativo
   },
   texto: {
     fontSize: 16,
-    color: 'white', // Cor de texto padrão
+    color: '#6C6C6C', // Cor de texto padrão
   },
   textoAtivo: {
     color: '#FFC107', // Cor do texto quando ativo

@@ -9,10 +9,15 @@ type Props = PropsWithChildren<{
   title?: string;
 }>;
 
-export default function ModalScreen({ isVisible, children, onClose,title="Modal" }: Props) {
+export default function ModalScreen({ isVisible, children, onClose, title = "Modal" }: Props) {
   return (
     <Modal animationType="slide" transparent={true} visible={isVisible}>
       <View style={styles.backDrop}>
+        <Pressable 
+          style={StyleSheet.absoluteFill} 
+          onPress={onClose}
+        />
+        
         <View style={styles.modalContainer}>
           <View style={styles.titleBar}>
             <View style={styles.titleContainer}>
@@ -20,11 +25,15 @@ export default function ModalScreen({ isVisible, children, onClose,title="Modal"
             </View>
             <View style={styles.titleButton}>
               <Pressable onPress={onClose}>
-                <MaterialIcons name="close" color="#fff" size={22} />
+                <MaterialIcons name="close" color="#000" size={22} />
               </Pressable>
             </View>
           </View>
-          <View style={styles.modalContent}>
+          
+          <View 
+            style={styles.modalContent}
+            onStartShouldSetResponder={() => true}
+          >
             {children}
           </View>
         </View>
@@ -35,46 +44,37 @@ export default function ModalScreen({ isVisible, children, onClose,title="Modal"
 
 const styles = StyleSheet.create({
   backDrop: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContainer: {
-    opacity: 1.0,
-    backgroundColor: '#25292e',
+    height: "75%",
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 20,
   },
   modalContent: {
-    backgroundColor: '#25292e',
-    margin: 12,
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 16,
   },
   titleBar: {
-    backgroundColor: '#464C55',
-    borderTopRightRadius: 10,
-    borderTopLeftRadius: 10,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     paddingHorizontal: 20,
-    flexDirection: 'row',
-    padding: 8,
-    height: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    height: 50,
   },
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   titleButton: {
-    backgroundColor: '#f7072f',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  title: {
-    color: '#fff',
-    fontSize: 16,
+    padding: 8,
   },
 });
