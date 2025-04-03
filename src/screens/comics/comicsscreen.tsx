@@ -13,8 +13,6 @@ export function ComicsScreen() {
 
       <Header/>
 
-      <DetalhesColecoesScreen/>
-
     </ThemedView>
   );
 }

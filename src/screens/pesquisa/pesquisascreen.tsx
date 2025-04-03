@@ -95,7 +95,7 @@ export function PesquisaScreen() {
 
       <View style={styles.searchContainer}>
         <View style={styles.inputContainer}>
-          <Ionicons name="search" size={20} color="#888" style={styles.icon} />
+          <Ionicons name="search" size={20} color="#9748FF" style={styles.icon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Pesquisar..."
@@ -103,8 +103,8 @@ export function PesquisaScreen() {
             onChangeText={setSearchTerm}
             placeholderTextColor="#777"
           />
-          <TouchableOpacity onPress={() => setFilterModalVisible(true)}>
-            <Ionicons name="options-outline" size={24} color="#888" />
+          <TouchableOpacity onPress={() => setFilterModalVisible(true)} >
+            <Ionicons name="options-outline" size={24} color="#9748FF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -135,7 +135,7 @@ export function PesquisaScreen() {
 
       {/* Modal de Filtros */}
       <Modal visible={filterModalVisible} animationType="slide" transparent={true}>
-        <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)}>
+        <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)} >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Filtrar Obras</Text>
@@ -155,7 +155,7 @@ export function PesquisaScreen() {
                 ))}
               </Picker>
 
-              <Button mode="contained" onPress={() => setFilterModalVisible(false)}>
+              <Button mode="contained" onPress={() => setFilterModalVisible(false)} style={{backgroundColor:"#9748FF"}}>
                 Aplicar Filtros
               </Button>
             </View>
@@ -182,7 +182,7 @@ export function PesquisaScreen() {
                 ))}
               </Picker>
 
-              <Button mode="contained" onPress={adicionarObra}>
+              <Button mode="contained" onPress={adicionarObra} style={{backgroundColor:"#9748FF"}}>
                 Adicionar
               </Button>
             </View>
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 5,
-    color: "#666",
+    color: "#9748FF",
   },
   searchInput: {
     flex: 1,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
-    borderColor: "#6200EE",
+    borderColor: "#9748FF",
     borderWidth: 1,
   },
   titulo: {
