@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ThemedText } from "@/src/components/ThemedText";
 import BotaoColecao from "@/src/components/BotaoColecao";
 import HeaderScreen from "@/src/components/HeaderScreen";
+import DetalhesColecoesScreen from "../detalhescolecoes";
 export function ComicsScreen() {
 
   return (
@@ -12,10 +13,7 @@ export function ComicsScreen() {
 
       <HeaderScreen />
 
-      <BotaoColecao titulo1="Bookmarks" titulo2="Coleções" />
-  
-
-      <ThemedText>Comics</ThemedText>
+      <DetalhesColecoesScreen/>
 
     </ThemedView>
   );

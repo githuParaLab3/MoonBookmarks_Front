@@ -10,10 +10,6 @@ export function AudiovisualSreen() {
   return (
     <ThemedView style={styles.container}>   
 
-      <ThemedText>Audiovisual</ThemedText>
-
-      <DetalhesBookmarksScreen/>
-
     </ThemedView>
   );
 }

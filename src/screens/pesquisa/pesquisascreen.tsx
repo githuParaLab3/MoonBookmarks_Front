@@ -201,6 +201,7 @@ export function PesquisaScreen() {
         <ActivityIndicator size="large" color="#6200ee" />
       ) : (
         <FlatList
+          style ={styles.flatlist}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           data={filteredObras}
@@ -237,6 +238,9 @@ const styles = StyleSheet.create({
   formContainer: {
     width: '100%',
     padding: 16,
+  },
+  flatlist:{
+    width: "80%"
   },
   input: {
     height: 40,
@@ -311,6 +315,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     width:"100%",
+    borderColor: "#8e24aa",
+    borderWidth: 1,
   },
   titulo: {
     fontSize: 18,

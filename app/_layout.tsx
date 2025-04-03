@@ -1,11 +1,13 @@
 import { Stack } from 'expo-router';
-import HeaderScreen from '@/src/components/HeaderScreen'; // Importa o header
+
 
 export default function RootLayout() {
   return (
 
       
       <Stack>
+        <Stack.Screen name="(autenticacao)" options={{ headerShown: false}}/>
+        <Stack.Screen name="index" options={{ headerShown: false}}/>
         <Stack.Screen name="(tabs)" options={{ headerShown: false}}/>
       </Stack>
    

@@ -1,19 +1,19 @@
-import { Button } from "@/src/components/Button";
 import { ThemedView } from "@/src/components/ThemedView";
-import { StyleSheet, FlatList, View, Text, ActivityIndicator, Image } from 'react-native';
+import { StyleSheet, FlatList, View, Text, ActivityIndicator, Image } from "react-native";
 import { useState, useEffect } from "react";
-import { ThemedText } from "@/src/components/ThemedText";
-import BotaoColecao from "@/src/components/BotaoColecao";
 import axios from "axios";
 import HeaderScreen from "@/src/components/HeaderScreen";
+import BotaoColecao from "@/src/components/BotaoColecao";
+import ColecoesScreen from "../colecoes";
+
 export function LivrosScreen() {
+  const [selectedTab, setSelectedTab] = useState("Bookmarks");
   const [obras, setObras] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Função para buscar as obras do backend
   const fetchObras = async () => {
     try {
-      const response = await axios.get('https://moonbookmarks-back.onrender.com/obras'); // Ajuste para o seu endpoint real
+      const response = await axios.get("https://moonbookmarks-back.onrender.com/obras");
       setObras(response.data);
       setLoading(false);
     } catch (error) {
@@ -22,24 +22,20 @@ export function LivrosScreen() {
     }
   };
 
-  // Carregar as obras quando a tela for carregada
   useEffect(() => {
     fetchObras();
   }, []);
 
-  // Função para renderizar os itens na FlatList
   const renderObra = ({ item }: { item: any }) => {
-    const imageUrl = item.imagem || 'https://via.placeholder.com/150'; // Se não tiver imagem, usa o placeholder
+    const imageUrl = item.imagem || "https://via.placeholder.com/150";
     return (
       <View style={styles.obraItem}>
-        <Image
-          source={{ uri: imageUrl }} // Usando a URL da imagem ou o placeholder
-          style={styles.imagem}
-          onError={() => console.log("Erro ao carregar a imagem")} // Lida com erro de carregamento
-        />
+        <Image source={{ uri: imageUrl }} style={styles.imagem} onError={() => console.log("Erro ao carregar a imagem")} />
         <View style={styles.textoContainer}>
           <Text style={styles.titulo}>{item.titulo}</Text>
-          <Text style={styles.progresso}>Progresso: {item.progresso ? `${item.progresso}%` : "Não iniciado"}</Text>
+          <Text style={styles.progresso}>
+            Progresso: {item.progresso ? `${item.progresso}%` : "Não iniciado"}
+          </Text>
         </View>
       </View>
     );
@@ -48,18 +44,28 @@ export function LivrosScreen() {
   return (
     <ThemedView style={styles.container}>
       <HeaderScreen />
-      <BotaoColecao titulo1="Bookmarks" titulo2="Coleções" />
+      <BotaoColecao
+        titulo1="Bookmarks"
+        titulo2="Coleções"
+        onPress1={() => setSelectedTab("Bookmarks")}
+        onPress2={() => setSelectedTab("Coleções")}
+        selectedTab={selectedTab}
+      />
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#6200ee" />
+      {selectedTab === "Bookmarks" ? (
+        loading ? (
+          <ActivityIndicator size="large" color="#6200ee" />
+        ) : (
+          <FlatList
+            style={styles.margemFlatlist}
+            data={obras}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderObra}
+            showsVerticalScrollIndicator={false}
+          />
+        )
       ) : (
-        <FlatList
-          style={styles.margemFlatlist}
-          data={obras}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderObra}
-          showsVerticalScrollIndicator={false}
-        />
+        <ColecoesScreen />
       )}
     </ThemedView>
   );
@@ -73,20 +79,19 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   margemFlatlist: {
+    width:"80%",
     marginBottom: 10,
-    marginTop:120,
+    marginTop: 10,
   },
   obraItem: {
-    backgroundColor: "#fff",
-    padding: 15,
-    marginVertical: 10,
-    width: "90%",
-    borderRadius: 8,
-    elevation: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "white",
+    borderColor: "#8e24aa",
     borderWidth: 1,
-    borderColor: "#6200ee", // Borda roxa
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
   },
   imagem: {
     width: 50,
@@ -100,10 +105,10 @@ const styles = StyleSheet.create({
   titulo: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333", // Cor do título
+    color: "#333",
   },
   progresso: {
     fontSize: 14,
-    color: "#6200ee", // Cor roxa para o progresso
+    color: "#6200ee",
   },
 });

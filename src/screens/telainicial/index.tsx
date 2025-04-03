@@ -1,0 +1,1 @@
+export {TelaInicialScreen as default} from './telainicialscreen'
