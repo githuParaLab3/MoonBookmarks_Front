@@ -114,7 +114,7 @@ export function PesquisaScreen() {
   return (
     <ThemedView style={styles.container}>
      
-      <FloatingActionButton onPress={() => setModalVisible(true)} />
+      <FloatingActionButton  onPress={() => setModalVisible(true)} />
 
       
       {modalVisible && (
@@ -272,7 +272,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
-    marginTop:60,
   },
   icon: {
     marginRight: 5,
@@ -287,7 +286,7 @@ const styles = StyleSheet.create({
     height: 40,
     backgroundColor: "#fff",
     borderRadius: 5,
-    marginTop:60,
+
   },
   generoInput: {
     width: "90%",

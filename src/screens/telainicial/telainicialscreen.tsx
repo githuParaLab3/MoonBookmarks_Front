@@ -11,7 +11,7 @@ export function TelaInicialScreen() {
       <Image source={require("../../../assets/images/logo.png")} style={styles.logo} />
       <Text style={styles.title}>Taiseki</Text>
       <Text style={styles.subtitle}>O seu aplicativo de bookmarks</Text>
-      <TouchableOpacity style={styles.button} onPress={() => router.navigate('/')}>
+      <TouchableOpacity style={styles.button} onPress={() => router.navigate('/(autenticacao)/(login)')}>
         <Text style={styles.buttonText}>ENTRE</Text>
       </TouchableOpacity>
     </View>

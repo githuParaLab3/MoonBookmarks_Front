@@ -24,7 +24,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
-    paddingHorizontal: 20,
   },
   topSection: {
     position: "absolute",
