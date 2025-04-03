@@ -7,9 +7,12 @@ import HeaderScreen from "@/src/components/HeaderScreen";
 import ColecoesScreen from "../colecoes";
 import ConfiguracoesScreen from "../configuracoes";
 import ModalDelecao from "@/src/components/ModalDelecao"; // 🔹 Importando o modal
+import { ModalEscolherColecao } from "@/src/components/ModalEscolherColecao";
+
 
 export function HomeScreen() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisivel, setModalVisivel] = useState(false);
 
   return (
     <ThemedView style={styles.container}>
@@ -17,6 +20,9 @@ export function HomeScreen() {
       <HeaderScreen/>
       
       <ThemedText>Home</ThemedText>
+
+      <Button title="Abrir Modal" onPress={() => setModalVisivel(true)} />
+      <ModalEscolherColecao visible={modalVisivel} onClose={() => setModalVisivel(false)} />
 
 
       <Button title="Abrir Modal" onPress={() => setModalVisible(true)} />

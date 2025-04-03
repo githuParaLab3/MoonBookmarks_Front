@@ -20,7 +20,7 @@ export function ColecoesScreen() {
       renderItem={({ item }) => (
         <View>
           <Text style={styles.categoryTitle}>{item.category}</Text>
-          <TouchableOpacity onPress={() => router.push("/")} style={styles.collectionCard}>
+          <TouchableOpacity onPress={() => router.navigate("/(tabs)/(comics)")} style={styles.collectionCard}>
             <View style={styles.imagePlaceholder}>
               <Ionicons name="image-outline" size={30} color="gray" />
             </View>

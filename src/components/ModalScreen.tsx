@@ -1,7 +1,14 @@
-import { Modal, View, Text, Pressable, StyleSheet } from 'react-native';
-import { PropsWithChildren } from 'react';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { ThemedText } from './ThemedText';
+import React, { PropsWithChildren, useEffect, useRef } from "react";
+import { 
+  Modal, 
+  View, 
+  Text, 
+  Pressable, 
+  StyleSheet, 
+  Animated, 
+  TouchableWithoutFeedback 
+} from "react-native";
+import { ThemedText } from "./ThemedText";
 
 type Props = PropsWithChildren<{
   isVisible: boolean;
@@ -10,29 +17,42 @@ type Props = PropsWithChildren<{
 }>;
 
 export default function ModalScreen({ isVisible, children, onClose, title = "Modal" }: Props) {
+  const translateY = useRef(new Animated.Value(300)).current;
+
+  useEffect(() => {
+    if (isVisible) {
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(translateY, {
+        toValue: 300,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [isVisible]);
+
   return (
-    <Modal animationType="slide" transparent={true} visible={isVisible}>
-      <View style={styles.backDrop}>
-        <Pressable 
-          style={StyleSheet.absoluteFill} 
-          onPress={onClose}
-        />
-        
-        <View style={styles.modalContainer}>
-          <View style={styles.titleBar}>
-            <View style={styles.titleContainer}>
-              <ThemedText type='subtitle'>{title}</ThemedText>
+    <Modal transparent visible={isVisible} animationType="none">
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.backDrop}>
+          <Animated.View style={[styles.modalContainer, { transform: [{ translateY }] }]}>
+            <View style={styles.dragIndicator} />
+            <View style={styles.titleBar}>
+              <View style={styles.titleContainer}>
+                <ThemedText type="subtitle">{title}</ThemedText>
+              </View>
             </View>
-          </View>
-          
-          <View 
-            style={styles.modalContent}
-            onStartShouldSetResponder={() => true}
-          >
-            {children}
-          </View>
+
+            <View style={styles.modalContent}>
+              {children}
+            </View>
+          </Animated.View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 }
@@ -50,10 +70,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     paddingBottom: 20,
   },
-  modalContent: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 16,
+  dragIndicator: {
+    width: 40,
+    height: 5,
+    backgroundColor: "lightgray",
+    borderRadius: 3,
+    alignSelf: "center",
+    marginVertical: 8,
   },
   titleBar: {
     backgroundColor: "#fff",
@@ -69,7 +92,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  titleButton: {
-    padding: 8,
+  modalContent: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 16,
   },
 });
