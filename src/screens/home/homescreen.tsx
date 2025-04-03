@@ -13,6 +13,9 @@ export function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
+
+      <HeaderScreen/>
+      
       <ThemedText>Home</ThemedText>
 
 

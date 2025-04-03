@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
     right: 40,  // Distância da borda direita
     backgroundColor: "#7A2FF9", // Cor roxa do botão
     width: 56,
+    zIndex: 100,
     height: 56,
     borderRadius: 28, // Deixa o botão circular
     justifyContent: "center",
