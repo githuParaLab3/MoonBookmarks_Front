@@ -35,6 +35,16 @@ export function PesquisaScreen() {
   const [message, setMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
+  // Estado para os campos do formulário do modal
+  const [form, setForm] = useState({
+    titulo: "",
+    descricao: "",
+    autor: "",
+    tipo: "",
+    imagem: "",
+    generos: "",
+  });
+
   const fetchObras = async () => {
     try {
       const response = await axios.get("https://moonbookmarks-back.onrender.com/obras");
@@ -46,9 +56,66 @@ export function PesquisaScreen() {
     }
   };
 
+  const deleteObra = async (id: number) => {
+    try {
+      await axios.delete(`https://moonbookmarks-back.onrender.com/obras/${id}`);
+      setObras(obras.filter((obra) => obra.id !== id));
+    } catch (error) {
+      console.error("Erro ao deletar a obra:", error);
+    }
+  };
+
   useEffect(() => {
     fetchObras();
   }, []);
+
+  const filteredObras = obras.filter(
+    (obra) =>
+      (obra.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        obra.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        obra.descricao.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (selectedTipo === "" || obra.tipo === selectedTipo) &&
+      (generoFilter === "" || obra.generos.some((genero) => genero.toLowerCase().includes(generoFilter.toLowerCase())))
+  );
+
+  const criarObra = () => {
+    const novaObra = {
+      titulo: form.titulo,
+      descricao: form.descricao,
+      autor: form.autor,
+      tipo: form.tipo,
+      imagem: form.imagem,
+      generos: form.generos.split(",").map((genero) => genero.trim()),
+    };
+
+    axios
+      .post("https://moonbookmarks-back.onrender.com/obras", novaObra, {
+        headers: { "Content-Type": "application/json" },
+      })
+      .then(() => {
+        setMessage("Obra criada com sucesso!");
+        setModalVisible(false); // Fechar o modal após criar a obra
+        setForm({
+          titulo: "",
+          descricao: "",
+          autor: "",
+          tipo: "",
+          imagem: "",
+          generos: "",
+        });
+      })
+      .catch((error) => {
+        console.log(error.response || error.message);
+        setMessage("Erro ao criar a obra: " + error.message);
+      });
+  };
+
+  const handleInputChange = (name: string, value: string) => {
+    setForm({
+      ...form,
+      [name]: value,
+    });
+  };
 
   String.prototype.capitalize = function (): string {
     return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
@@ -58,18 +125,80 @@ export function PesquisaScreen() {
     <ThemedView style={styles.container}>
       <FloatingActionButton onPress={() => setModalVisible(true)} />
 
+      {modalVisible && (
+        <ModalScreen isVisible={modalVisible} onClose={() => setModalVisible(false)} title="Criar Obra">
+          <View style={styles.formContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Título"
+              value={form.titulo}
+              onChangeText={(text) => handleInputChange("titulo", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Descrição"
+              value={form.descricao}
+              onChangeText={(text) => handleInputChange("descricao", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Autor"
+              value={form.autor}
+              onChangeText={(text) => handleInputChange("autor", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Tipo (ex: MANGA)"
+              value={form.tipo}
+              onChangeText={(text) => handleInputChange("tipo", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Imagem (URL)"
+              value={form.imagem}
+              onChangeText={(text) => handleInputChange("imagem", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Gêneros (separados por vírgula)"
+              value={form.generos}
+              onChangeText={(text) => handleInputChange("generos", text)}
+            />
+            <Button style={{ backgroundColor: "#9748FF" }} mode="contained" onPress={criarObra}>
+              Criar Obra
+            </Button>
+          </View>
+        </ModalScreen>
+      )}
+
       <View style={styles.searchContainer}>
         <View style={styles.inputContainer}>
           <Ionicons name="search" size={20} color="#888" style={styles.icon} />
-          <TextInput style={styles.searchInput} placeholder="Pesquisar..." value={searchTerm} onChangeText={setSearchTerm} placeholderTextColor="#777" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Pesquisar..."
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+            placeholderTextColor="#777"
+          />
         </View>
       </View>
 
       <View style={styles.filterContainer}>
-        <TextInput style={styles.generoInput} placeholder="Filtrar por gênero" value={generoFilter} onChangeText={setGeneroFilter} placeholderTextColor="#777" />
-        <Picker selectedValue={selectedTipo} style={styles.picker} onValueChange={(itemValue: string) => setSelectedTipo(itemValue)}>
+        <TextInput
+          style={styles.generoInput}
+          placeholder="Filtrar por gênero"
+          value={generoFilter}
+          onChangeText={setGeneroFilter}
+          placeholderTextColor="#777"
+        />
+        <Picker
+          selectedValue={selectedTipo}
+          style={styles.picker}
+          onValueChange={(itemValue: string) => setSelectedTipo(itemValue)}
+        >
           {tipos.map((tipo) => (
-            <Picker.Item key={tipo} label={tipo.capitalize() || "Todos"} value={tipo} />
+            <Picker.Item key={tipo} label={tipo.capitalize() || "Todos"} value={tipo.toLowerCase()} />
           ))}
         </Picker>
       </View>
@@ -83,7 +212,7 @@ export function PesquisaScreen() {
           style={styles.flatlist}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          data={obras}
+          data={filteredObras}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <Card style={styles.obraItem}>
@@ -95,7 +224,7 @@ export function PesquisaScreen() {
                 <Text style={styles.generos}>Gêneros: {item.generos.join(", ")}</Text>
               </Card.Content>
               <Card.Actions>
-                <TouchableRipple onPress={() => console.log("Deletar")} style={styles.deleteButton}>
+                <TouchableRipple onPress={() => deleteObra(item.id)} style={styles.deleteButton}>
                   <Text style={styles.deleteText}>Deletar</Text>
                 </TouchableRipple>
               </Card.Actions>
@@ -113,6 +242,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+  },
+  formContainer: {
+    width: "100%",
+    padding: 16,
+  },
+  flatlist: {
+    width: "80%",
+  },
+  input: {
+    height: 40,
+    marginBottom: 12,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: "#fff",
   },
   searchContainer: {
     flexDirection: "row",
@@ -146,21 +290,21 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   filterContainer: {
-    flexDirection: "row", // Deixa os elementos na mesma linha
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     width: "90%",
     marginBottom: 20,
   },
   generoInput: {
-    flex: 1, // Faz o input ocupar o máximo possível do espaço disponível
+    flex: 1,
     height: 40,
     borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 5,
     paddingLeft: 10,
     backgroundColor: "#fff",
-    marginRight: 10, // Dá um espaço entre o input e o picker
+    marginRight: 10,
   },
   picker: {
     width: 150,
@@ -172,9 +316,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
-  },
-  flatlist: {
-    width: "90%",
   },
   obraItem: {
     backgroundColor: "#fff",
