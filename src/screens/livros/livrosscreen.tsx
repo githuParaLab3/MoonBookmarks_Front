@@ -29,7 +29,9 @@ export function LivrosScreen() {
   }, []);
 
   const renderObra = ({ item }: { item: any }) => {
-    const imageUrl = item.imagem || "https://via.placeholder.com/150";
+    const imageUrl = item.imagem && item.imagem.trim() ? item.imagem : "https://m.media-amazon.com/images/I/81qPzeEO5IL.jpg";
+
+
     return (
       <TouchableOpacity onPress={() => router.navigate('/')} style={styles.obraItem}>
         <Image source={{ uri: imageUrl }} style={styles.imagem} />
