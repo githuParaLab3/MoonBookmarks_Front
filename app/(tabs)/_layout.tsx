@@ -1,5 +1,4 @@
 import { View, StyleSheet } from 'react-native';
-import HeaderScreen from '@/src/components/HeaderScreen'; // Importa o header
 import IconSymbol, { IconColor } from '@/src/components/iconsymbol';
 import { Tabs } from 'expo-router';
 
@@ -61,7 +60,7 @@ export default function TabLayout() {
           <Tabs.Screen
             name="(audiovisual)"
             options={{
-              title: 'Audiovisual',
+              title: 'Vídeo',
               tabBarIcon: ({ color }: TabIconProps) => (
                 <IconSymbol size={28} name="film" color={color} />
               ),

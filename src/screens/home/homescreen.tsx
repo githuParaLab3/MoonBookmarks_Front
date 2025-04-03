@@ -1,56 +1,89 @@
-import { Button } from "react-native";
-import { ThemedView } from "@/src/components/ThemedView";
-import { StyleSheet, View } from "react-native";
-import { useState } from "react";
-import { ThemedText } from "@/src/components/ThemedText";
-import HeaderScreen from "@/src/components/HeaderScreen";
-import ColecoesScreen from "../colecoes";
-import ConfiguracoesScreen from "../configuracoes";
-import ModalDelecao from "@/src/components/ModalDelecao"; // 🔹 Importando o modal
-import { ModalEscolherColecao } from "@/src/components/ModalEscolherColecao";
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import Header from "@/src/components/Header";
 
+const collections = [
+  { id: "1", name: "Mangás", icon: "book-outline" },
+  { id: "2", name: "HQs", icon: "library-outline" },
+  { id: "3", name: "Favoritos", icon: "heart-outline" },
+];
 
-export function HomeScreen() {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalVisivel, setModalVisivel] = useState(false);
+export  function HomeScreen() {
+  const router = useRouter();
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
+      <Header/>
 
-      <HeaderScreen/>
-      
-      <ThemedText>Home</ThemedText>
+      <Text style={styles.sectionTitle}>Suas Coleções</Text>
 
-      <Button title="Abrir Modal" onPress={() => setModalVisivel(true)} />
-      <ModalEscolherColecao visible={modalVisivel} onClose={() => setModalVisivel(false)} />
-
-
-      <Button title="Abrir Modal" onPress={() => setModalVisible(true)} />
-
-     
-      <ModalDelecao
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onConfirm={() => {
-          console.log("Item excluído!");
-          setModalVisible(false);
-        }}
+      <FlatList
+        data={collections}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.collectionItem} onPress={() => router.push(`/`)}>
+            <Ionicons name={item.icon as any} size={24} color="#8A42F5" />
+            <Text style={styles.collectionText}>{item.name}</Text>
+          </TouchableOpacity>
+        )}
       />
-    </ThemedView>
+
+      <TouchableOpacity style={styles.addButton} onPress={() => router.push("/")}>
+        <Ionicons name="add-outline" size={30} color="#fff" />
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 20,
   },
-  content: {
-    flex: 1,
-  },
-  footerContainer: {
-    height: 60,
+  profileContainer: {
+    flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#8A42F5",
+    padding: 15,
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  greeting: {
+    fontSize: 18,
+    color: "#fff",
+    marginLeft: 10,
+    fontWeight: "bold",
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#8A42F5",
+    marginBottom: 10,
+    marginTop:60
+  },
+  collectionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 10,
+  },
+  collectionText: {
+    fontSize: 16,
+    marginLeft: 10,
+    color: "#333",
+  },
+  addButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#8A42F5",
+    padding: 15,
+    borderRadius: 50,
+    elevation: 5,
   },
 });

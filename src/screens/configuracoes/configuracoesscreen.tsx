@@ -15,22 +15,22 @@ export function ConfiguracoesScreen() {
       <Text style={styles.header}>Configurações</Text>
 
       <TouchableOpacity style={styles.option}>
-        <Ionicons name="settings-outline" size={24} color="#9C27B0" />
+        <Ionicons name="settings-outline" size={24} color="#9748FF" />
         <Text style={styles.optionText}>Geral</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.option}>
-        <Ionicons name="cloud-upload-outline" size={24} color="#9C27B0" />
+        <Ionicons name="cloud-upload-outline" size={24} color="#9748FF" />
         <Text style={styles.optionText}>Backup e Exportação</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.option}>
-        <Ionicons name="help-circle-outline" size={24} color="#9C27B0" />
+        <Ionicons name="help-circle-outline" size={24} color="#9748FF" />
         <Text style={styles.optionText}>Ajuda</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.option}>
-        <Ionicons name="chatbubble-ellipses-outline" size={24} color="#9C27B0" />
+        <Ionicons name="chatbubble-ellipses-outline" size={24} color="#9748FF" />
         <Text style={styles.optionText}>Sobre nós</Text>
       </TouchableOpacity>
 

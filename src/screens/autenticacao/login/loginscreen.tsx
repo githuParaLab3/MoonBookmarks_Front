@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TextInput, TouchableOpacity, StyleSheet, Text, Image } from "react-native";
+import { View, TextInput, TouchableOpacity, StyleSheet, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
@@ -9,15 +9,17 @@ export function LoginScreen() {
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    router.navigate('/(tabs)/(home)')
+    router.navigate('/(tabs)/(home)');
+  };
+
+  const handleRegisterRedirect = () => {
+    router.navigate('/(autenticacao)/(cadastro)'); // Ajuste a rota conforme necessário
   };
 
   return (
-    
     <View style={styles.container}>
-
       <View style={styles.topSection} />
-      
+
       <View style={styles.header}>
         <Text style={styles.welcomeText}>Bem-vindo!</Text>
         <Text style={styles.subtitle}>É bom ver você novamente</Text>
@@ -54,6 +56,12 @@ export function LoginScreen() {
 
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginText}>Entrar</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleRegisterRedirect} style={styles.registerRedirect}>
+        <Text style={styles.registerText}>
+          Ainda não tem uma conta? <Text style={styles.registerLink}>Cadastre-se</Text>
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -128,4 +136,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  registerRedirect: {
+    marginTop: 20,
+  },
+  registerText: {
+    fontSize: 14,
+    color: "#A085C3",
+  },
+  registerLink: {
+    color: "#9748FF",
+    fontWeight: "bold",
+  },
 });
+

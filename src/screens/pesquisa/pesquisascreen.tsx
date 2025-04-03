@@ -1,21 +1,17 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, View, TextInput, FlatList, ActivityIndicator } from "react-native";
+import { 
+  StyleSheet, View, TextInput, FlatList, ActivityIndicator, 
+  TouchableOpacity, Modal, Keyboard, TouchableWithoutFeedback 
+} from "react-native";
 import { ThemedView } from "@/src/components/ThemedView";
 import { ThemedText } from "@/src/components/ThemedText";
 import { Picker } from "@react-native-picker/picker";
 import axios from "axios";
-import ModalScreen from "@/src/components/ModalScreen"; 
 import FloatingActionButton from "@/src/components/FloatingActionButton";
 import { Ionicons } from "@expo/vector-icons";
-import { Button, Card, Text, Paragraph, TouchableRipple } from "react-native-paper";
+import { Button, Card, Text, Paragraph } from "react-native-paper";
 
-declare global {
-  interface String {
-    capitalize(): string;
-  }
-}
-
-const tipos = ["", "ANIME", "MANGA", "MANHUA", "MANHWA", "SERIE", "FILME", "NOVEL", "LIVRO"];
+const tipos = [ "ANIME", "MANGA", "MANHUA", "MANHWA", "SERIE", "FILME", "NOVEL", "LIVRO"];
 
 interface Obra {
   id: number;
@@ -32,18 +28,18 @@ export function PesquisaScreen() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTipo, setSelectedTipo] = useState("");
   const [generoFilter, setGeneroFilter] = useState("");
-  const [message, setMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
 
-  // Estado para os campos do formulário do modal
-  const [form, setForm] = useState({
-    titulo: "",
-    descricao: "",
-    autor: "",
-    tipo: "",
-    imagem: "",
-    generos: "",
-  });
+  const [novoTitulo, setNovoTitulo] = useState("");
+  const [novaDescricao, setNovaDescricao] = useState("");
+  const [novoAutor, setNovoAutor] = useState("");
+  const [novoTipo, setNovoTipo] = useState("");
+  const [novoGeneros, setNovoGeneros] = useState("");
+
+  useEffect(() => {
+    fetchObras();
+  }, []);
 
   const fetchObras = async () => {
     try {
@@ -56,120 +52,46 @@ export function PesquisaScreen() {
     }
   };
 
-  const deleteObra = async (id: number) => {
+  const adicionarObra = async () => {
+    if (!novoTitulo || !novaDescricao || !novoAutor || !novoTipo || !novoGeneros) {
+      alert("Preencha todos os campos!");
+      return;
+    }
+
+    const novaObra = {
+      titulo: novoTitulo,
+      descricao: novaDescricao,
+      autor: novoAutor,
+      tipo: novoTipo.toUpperCase(),
+      generos: novoGeneros.split(",").map((g) => g.trim()),
+    };
+
     try {
-      await axios.delete(`https://moonbookmarks-back.onrender.com/obras/${id}`);
-      setObras(obras.filter((obra) => obra.id !== id));
+      await axios.post("https://moonbookmarks-back.onrender.com/obras", novaObra);
+      setModalVisible(false);
+      fetchObras();
+      setNovoTitulo("");
+      setNovaDescricao("");
+      setNovoAutor("");
+      setNovoTipo("");
+      setNovoGeneros("");
     } catch (error) {
-      console.error("Erro ao deletar a obra:", error);
+      console.error("Erro ao adicionar obra:", error);
     }
   };
-
-  useEffect(() => {
-    fetchObras();
-  }, []);
 
   const filteredObras = obras.filter(
     (obra) =>
       (obra.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
         obra.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
         obra.descricao.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedTipo === "" || obra.tipo === selectedTipo) &&
+      (selectedTipo === "" || obra.tipo.toLowerCase() === selectedTipo.toLowerCase()) &&
       (generoFilter === "" || obra.generos.some((genero) => genero.toLowerCase().includes(generoFilter.toLowerCase())))
   );
-
-  const criarObra = () => {
-    const novaObra = {
-      titulo: form.titulo,
-      descricao: form.descricao,
-      autor: form.autor,
-      tipo: form.tipo,
-      imagem: form.imagem,
-      generos: form.generos.split(",").map((genero) => genero.trim()),
-    };
-
-    axios
-      .post("https://moonbookmarks-back.onrender.com/obras", novaObra, {
-        headers: { "Content-Type": "application/json" },
-      })
-      .then(() => {
-        setMessage("Obra criada com sucesso!");
-        setModalVisible(false); // Fechar o modal após criar a obra
-        setForm({
-          titulo: "",
-          descricao: "",
-          autor: "",
-          tipo: "",
-          imagem: "",
-          generos: "",
-        });
-      })
-      .catch((error) => {
-        console.log(error.response || error.message);
-        setMessage("Erro ao criar a obra: " + error.message);
-      });
-  };
-
-  const handleInputChange = (name: string, value: string) => {
-    setForm({
-      ...form,
-      [name]: value,
-    });
-  };
-
-  String.prototype.capitalize = function (): string {
-    return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase();
-  };
 
   return (
     <ThemedView style={styles.container}>
       <FloatingActionButton onPress={() => setModalVisible(true)} />
-
-      {modalVisible && (
-        <ModalScreen isVisible={modalVisible} onClose={() => setModalVisible(false)} title="Criar Obra">
-          <View style={styles.formContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Título"
-              value={form.titulo}
-              onChangeText={(text) => handleInputChange("titulo", text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Descrição"
-              value={form.descricao}
-              onChangeText={(text) => handleInputChange("descricao", text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Autor"
-              value={form.autor}
-              onChangeText={(text) => handleInputChange("autor", text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Tipo (ex: MANGA)"
-              value={form.tipo}
-              onChangeText={(text) => handleInputChange("tipo", text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Imagem (URL)"
-              value={form.imagem}
-              onChangeText={(text) => handleInputChange("imagem", text)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Gêneros (separados por vírgula)"
-              value={form.generos}
-              onChangeText={(text) => handleInputChange("generos", text)}
-            />
-            <Button style={{ backgroundColor: "#9748FF" }} mode="contained" onPress={criarObra}>
-              Criar Obra
-            </Button>
-          </View>
-        </ModalScreen>
-      )}
 
       <View style={styles.searchContainer}>
         <View style={styles.inputContainer}>
@@ -181,26 +103,10 @@ export function PesquisaScreen() {
             onChangeText={setSearchTerm}
             placeholderTextColor="#777"
           />
+          <TouchableOpacity onPress={() => setFilterModalVisible(true)}>
+            <Ionicons name="options-outline" size={24} color="#888" />
+          </TouchableOpacity>
         </View>
-      </View>
-
-      <View style={styles.filterContainer}>
-        <TextInput
-          style={styles.generoInput}
-          placeholder="Filtrar por gênero"
-          value={generoFilter}
-          onChangeText={setGeneroFilter}
-          placeholderTextColor="#777"
-        />
-        <Picker
-          selectedValue={selectedTipo}
-          style={styles.picker}
-          onValueChange={(itemValue: string) => setSelectedTipo(itemValue)}
-        >
-          {tipos.map((tipo) => (
-            <Picker.Item key={tipo} label={tipo.capitalize() || "Todos"} value={tipo.toLowerCase()} />
-          ))}
-        </Picker>
       </View>
 
       <ThemedText style={styles.title}>Obras</ThemedText>
@@ -211,7 +117,6 @@ export function PesquisaScreen() {
         <FlatList
           style={styles.flatlist}
           showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
           data={filteredObras}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
@@ -223,15 +128,67 @@ export function PesquisaScreen() {
                 <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
                 <Text style={styles.generos}>Gêneros: {item.generos.join(", ")}</Text>
               </Card.Content>
-              <Card.Actions>
-                <TouchableRipple onPress={() => deleteObra(item.id)} style={styles.deleteButton}>
-                  <Text style={styles.deleteText}>Deletar</Text>
-                </TouchableRipple>
-              </Card.Actions>
             </Card>
           )}
         />
       )}
+
+      {/* Modal de Filtros */}
+      <Modal visible={filterModalVisible} animationType="slide" transparent={true}>
+        <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Filtrar Obras</Text>
+
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Filtrar por gênero"
+                value={generoFilter}
+                onChangeText={setGeneroFilter}
+                placeholderTextColor="#777"
+              />
+
+              <Picker selectedValue={selectedTipo} style={styles.picker} onValueChange={setSelectedTipo}>
+                <Picker.Item label="Selecione o tipo de obra" value="" />
+                {tipos.map((tipo) => (
+                  <Picker.Item key={tipo} label={tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase()} value={tipo.toLowerCase()} />
+                ))}
+              </Picker>
+
+              <Button mode="contained" onPress={() => setFilterModalVisible(false)}>
+                Aplicar Filtros
+              </Button>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Modal de Criação de Obra */}
+      <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+          <View style={styles.bottomModalContainer}>
+            <View style={styles.bottomModal}>
+              <Text style={styles.modalTitle}>Adicionar Nova Obra</Text>
+
+              <TextInput style={styles.modalInput} placeholder="Título" value={novoTitulo} onChangeText={setNovoTitulo} />
+              <TextInput style={styles.modalInput} placeholder="Descrição" value={novaDescricao} onChangeText={setNovaDescricao} />
+              <TextInput style={styles.modalInput} placeholder="Autor" value={novoAutor} onChangeText={setNovoAutor} />
+              <TextInput style={styles.modalInput} placeholder="Gêneros (separados por vírgula)" value={novoGeneros} onChangeText={setNovoGeneros} />
+
+              <Picker selectedValue={novoTipo} style={styles.picker} onValueChange={setNovoTipo}>
+                <Picker.Item label="Selecione o tipo de obra" value="" />
+                {tipos.map((tipo) => (
+                  <Picker.Item key={tipo} label={tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase()} value={tipo.toUpperCase()} />
+                ))}
+              </Picker>
+
+              <Button mode="contained" onPress={adicionarObra}>
+                Adicionar
+              </Button>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </ThemedView>
   );
 }
@@ -239,125 +196,135 @@ export function PesquisaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     padding: 20,
+    backgroundColor: "#F5F5F5",
   },
-  formContainer: {
-    width: "100%",
-    padding: 16,
+  bottomModalContainer: { 
+    flex: 1, 
+    justifyContent: "flex-end",
   },
-  flatlist: {
-    width: "80%",
-  },
-  input: {
-    height: 40,
-    marginBottom: 12,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: "#fff",
+  bottomModal: { 
+    backgroundColor: "#FFFFFF", 
+    padding: 20, 
+    borderTopLeftRadius: 15, 
+    borderTopRightRadius: 15, 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   searchContainer: {
     flexDirection: "row",
-    width: "90%",
+    width: "100%",
     alignItems: "center",
-    justifyContent: "space-between",
     marginBottom: 10,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    backgroundColor: "#EDEDED",
+    borderRadius: 12,
     paddingHorizontal: 10,
     flex: 1,
-    marginRight: 10,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#CCCCCC",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
   },
   icon: {
     marginRight: 5,
+    color: "#666",
   },
   searchInput: {
     flex: 1,
     height: 40,
     color: "#333",
   },
-  filterContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "90%",
-    marginBottom: 20,
-  },
-  generoInput: {
-    flex: 1,
-    height: 40,
-    borderColor: "#ddd",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingLeft: 10,
-    backgroundColor: "#fff",
-    marginRight: 10,
-  },
-  picker: {
-    width: 150,
-    height: 50,
-    backgroundColor: "#fff",
-    borderRadius: 5,
-  },
   title: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#333",
     marginBottom: 10,
   },
+  flatlist: {
+    width: "100%",
+  },
   obraItem: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 3,
     elevation: 3,
-    width: "100%",
-    borderColor: "#8e24aa",
+    borderColor: "#6200EE",
     borderWidth: 1,
   },
   titulo: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5,
+    color: "#222",
   },
   autor: {
     fontSize: 12,
-    color: "#777",
+    color: "#666",
   },
   tipo: {
     fontSize: 12,
-    color: "#999",
+    color: "#777",
   },
   generos: {
     fontSize: 12,
-    color: "#333",
+    color: "#555",
     marginTop: 5,
   },
-  deleteButton: {
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: "#9748FF",
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  deleteText: {
-    color: "#fff",
+  modalContent: {
+    width: "80%",
+    backgroundColor: "#FFFFFF",
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
     fontWeight: "bold",
+    color: "#222",
+    marginBottom: 10,
+  },
+  modalInput: {
+    height: 40,
+    borderColor: "#CCC",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingLeft: 10,
+    backgroundColor: "#F8F8F8",
+    color: "#333",
+    marginBottom: 10,
+  },
+  picker: {
+    width: "100%",
+    height: 50,
+    backgroundColor: "#F8F8F8",
+    color: "#333",
+    borderRadius: 5,
+    marginBottom: 10,
   },
 });
+
+

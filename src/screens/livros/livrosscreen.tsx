@@ -2,7 +2,7 @@ import { ThemedView } from "@/src/components/ThemedView";
 import { StyleSheet, FlatList, View, Text, ActivityIndicator, Image, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import HeaderScreen from "@/src/components/HeaderScreen";
+import Header from "@/src/components/Header";
 import BotaoColecao from "@/src/components/BotaoColecao";
 import ColecoesScreen from "../colecoes";
 import { useRouter } from "expo-router";
@@ -45,7 +45,7 @@ export function LivrosScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <HeaderScreen />
+      <Header />
       <BotaoColecao
         titulo1="Bookmarks"
         titulo2="Coleções"

@@ -10,13 +10,17 @@ export function CadastroScreen() {
   const [password, setPassword] = useState("");
 
   const handleRegister = () => {
-    router.navigate('/(tabs)/(home)')
+    router.navigate('/(tabs)/(home)');
+  };
+
+  const handleLoginRedirect = () => {
+    router.navigate('/(autenticacao)/(login)'); // Ajuste a rota conforme necessário
   };
 
   return (
-    
     <View style={styles.container}>
       <View style={styles.topSection} />
+      
       <View style={styles.header}>
         <Text style={styles.title}>Registre-se</Text>
         <Text style={styles.subtitle}>É gratuito, rápido e eficiente</Text>
@@ -68,6 +72,12 @@ export function CadastroScreen() {
 
       <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
         <Text style={styles.registerText}>Registrar-se</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleLoginRedirect} style={styles.loginRedirect}>
+        <Text style={styles.loginText}>
+          Já tem uma conta? <Text style={styles.loginLink}>Entrar</Text>
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -140,6 +150,17 @@ const styles = StyleSheet.create({
   registerText: {
     color: "#fff",
     fontSize: 18,
+    fontWeight: "bold",
+  },
+  loginRedirect: {
+    marginTop: 20,
+  },
+  loginText: {
+    fontSize: 14,
+    color: "#A085C3",
+  },
+  loginLink: {
+    color: "#9748FF",
     fontWeight: "bold",
   },
 });

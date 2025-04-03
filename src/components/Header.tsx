@@ -1,19 +1,22 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 
 // Componente do Header
-export default function HeaderScreen() {
+export default function Header() {
   const router = useRouter();
+
+  const handleNavigateToSettings = () => {
+    router.navigate('/(configuracoes)'); // Ajuste a rota conforme necessário
+  };
 
   return (
     <View style={styles.headerContainer}>
-      <View style={styles.header}>
+      <TouchableOpacity style={styles.header} onPress={handleNavigateToSettings}>
         <Text style={styles.headerTitle}>Olá, João</Text>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   headerContainer: {
@@ -40,27 +43,10 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   headerTitle: {
-    paddingLeft:15,
+    paddingLeft: 15,
     color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
-    justifyContent: 'center'
-  },
-  profileImage: {
-    width: 35,
-    height: 35,
-    borderRadius: 50,
-  },
-  collectionsButton: {
-    marginTop: 10,
-    backgroundColor: '#9748FF',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-  },
-  collectionsText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
+    justifyContent: 'center',
   },
 });

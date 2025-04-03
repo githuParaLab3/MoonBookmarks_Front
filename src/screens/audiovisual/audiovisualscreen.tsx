@@ -4,14 +4,14 @@ import { StyleSheet } from 'react-native';
 import { useState } from "react";
 import { ThemedText } from "@/src/components/ThemedText";
 import DetalhesBookmarksScreen from "../detalhesbookmarks";
-import HeaderScreen from "@/src/components/HeaderScreen";
+import Header from "@/src/components/Header";
 
 export function AudiovisualSreen() {
 
   return (
     <ThemedView style={styles.container}>   
 
-    <HeaderScreen/>
+    <Header/>
 
     </ThemedView>
   );
