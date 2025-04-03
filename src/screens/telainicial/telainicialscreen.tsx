@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
 
 export function TelaInicialScreen() {
-    const router = useRouter();
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -11,9 +11,16 @@ export function TelaInicialScreen() {
       <Image source={require("../../../assets/images/logo.png")} style={styles.logo} />
       <Text style={styles.title}>Taiseki</Text>
       <Text style={styles.subtitle}>O seu aplicativo de bookmarks</Text>
-      <TouchableOpacity style={styles.button} onPress={() => router.navigate('/(autenticacao)/(login)')}>
-        <Text style={styles.buttonText}>ENTRE</Text>
-      </TouchableOpacity>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => router.navigate("/(autenticacao)/(login)")}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={() => router.navigate("/(autenticacao)/(cadastro)")}>
+          <Text style={[styles.buttonText, styles.buttonTextSecondary]}>Cadastro</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -24,48 +31,63 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
-    
   },
   topSection: {
     position: "absolute",
     top: 0,
     left: 0,
     width: "100%",
-    height: "25%",
-    backgroundColor: "#8A42F5",
-    borderBottomRightRadius: 50,
+    height: "20%",
+    backgroundColor: "#9748FF",
+    borderBottomRightRadius: 80,
   },
   logo: {
-    width: 100,
-    height: 100,
-    tintColor: "#8A42F5",
-    marginBottom: 20,
+    width: 120,
+    height: 120,
+    tintColor: "#9748FF",
+    marginBottom: 15,
   },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "bold",
-    color: "#000",
+    color: "#333",
   },
   subtitle: {
     fontSize: 16,
-    color: "#555",
+    color: "#666",
     textAlign: "center",
     marginBottom: 40,
   },
+  buttonContainer: {
+    width: "80%",
+    alignItems: "center",
+  },
   button: {
-    backgroundColor: "#8A42F5",
+    backgroundColor: "#9748FF",
     paddingVertical: 15,
-    paddingHorizontal: 40,
+    width: "100%",
     borderRadius: 50,
+    alignItems: "center",
+    marginBottom: 15,
     elevation: 5, // Sombra no Android
     shadowColor: "#000", // Sombra no iOS
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
+  buttonSecondary: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: "#9748FF",
+  },
   buttonText: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "bold",
   },
+  buttonTextSecondary: {
+    color: "#9748FF",
+  },
 });
+
+export default TelaInicialScreen;
