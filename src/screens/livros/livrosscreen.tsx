@@ -1,15 +1,17 @@
 import { ThemedView } from "@/src/components/ThemedView";
-import { StyleSheet, FlatList, View, Text, ActivityIndicator, Image } from "react-native";
+import { StyleSheet, FlatList, View, Text, ActivityIndicator, Image, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import HeaderScreen from "@/src/components/HeaderScreen";
 import BotaoColecao from "@/src/components/BotaoColecao";
 import ColecoesScreen from "../colecoes";
+import { useRouter } from "expo-router";
 
 export function LivrosScreen() {
   const [selectedTab, setSelectedTab] = useState("Bookmarks");
   const [obras, setObras] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const fetchObras = async () => {
     try {
@@ -29,15 +31,15 @@ export function LivrosScreen() {
   const renderObra = ({ item }: { item: any }) => {
     const imageUrl = item.imagem || "https://via.placeholder.com/150";
     return (
-      <View style={styles.obraItem}>
-        <Image source={{ uri: imageUrl }} style={styles.imagem} onError={() => console.log("Erro ao carregar a imagem")} />
+      <TouchableOpacity onPress={() => router.navigate('/')} style={styles.obraItem}>
+        <Image source={{ uri: imageUrl }} style={styles.imagem} />
         <View style={styles.textoContainer}>
           <Text style={styles.titulo}>{item.titulo}</Text>
           <Text style={styles.progresso}>
             Progresso: {item.progresso ? `${item.progresso}%` : "Não iniciado"}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -79,7 +81,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   margemFlatlist: {
-    width:"80%",
+    
+    width: "80%",
     marginBottom: 10,
     marginTop: 10,
   },
