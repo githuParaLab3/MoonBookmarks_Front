@@ -10,9 +10,26 @@ interface ObraDetalhes {
   titulo: string;
   descricao: string;
   imagem: string;
+  autor: string;
+  tipo: string;  // Agora tipo é uma string (valor do enum)
+  generos: string[]; // Gêneros da obra
 }
 
-export  function DetalhesObraScreen() {
+// Função para exibir o tipo de forma legível, caso seja necessário
+const formatTipo = (tipo: string) => {
+  switch (tipo) {
+    case 'LIVRO':
+      return 'Livro';
+    case 'MANGA':
+      return 'Mangá';
+    case 'ANIME':
+      return 'Anime';
+    default:
+      return tipo;  // Caso o tipo seja inesperado, retornamos o valor original
+  }
+}
+
+export function DetalhesObraScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { id } = params as { id: string }; // Pegando o parâmetro 'id'
@@ -23,8 +40,9 @@ export  function DetalhesObraScreen() {
   useEffect(() => {
     if (id) {
       axios
-        .get(`https://moonbookmarks-back.onrender.com//obras/${id}`) // Substitua pela URL real da sua API
+        .get(`https://moonbookmarks-back.onrender.com/obras/${id}`) // URL corrigida
         .then((response) => {
+          console.log('Dados recebidos:', response.data); // Verifique o que vem no response
           setObra(response.data);
         })
         .catch((error) => {
@@ -45,7 +63,7 @@ export  function DetalhesObraScreen() {
           text: "Excluir",
           onPress: async () => {
             try {
-              await axios.delete(`https://api.exemplo.com/obras/${id}`);
+              await axios.delete(`https://moonbookmarks-back.onrender.com/obras/${id}`);
               Alert.alert("Obra excluída com sucesso!");
               router.back();
             } catch (error) {
@@ -61,12 +79,16 @@ export  function DetalhesObraScreen() {
 
   // Função para editar a obra
   const handleEditarObra = () => {
-   
+    ; // Navegar para a tela de edição da obra
   };
 
   if (!obra) {
     return <Text>Carregando...</Text>;
   }
+
+  // Formatação do tipo para exibição
+  const tipoFormatado = formatTipo(obra.tipo);
+  const generos = Array.isArray(obra.generos) && obra.generos.length > 0 ? obra.generos.join(", ") : "Sem gêneros";
 
   return (
     <View style={styles.container}>
@@ -80,6 +102,9 @@ export  function DetalhesObraScreen() {
       <Image source={{ uri: obra.imagem }} style={styles.obraImage} />
       <Text style={styles.titulo}>{obra.titulo}</Text>
       <Text style={styles.descricao}>{obra.descricao}</Text>
+      <Text style={styles.tipo}>Tipo: {tipoFormatado}</Text>
+      <Text style={styles.generos}>Gêneros: {generos}</Text>
+      <Text style={styles.autor}>Autor: {obra.autor}</Text>
 
       <View style={styles.actions}>
         <TouchableOpacity style={styles.editButton} onPress={handleEditarObra}>
@@ -128,6 +153,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   descricao: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 16,
+  },
+  tipo: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 8,
+  },
+  generos: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 8,
+  },
+  autor: {
     fontSize: 16,
     color: "#666",
     marginBottom: 16,

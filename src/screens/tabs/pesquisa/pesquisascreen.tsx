@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { 
   StyleSheet, View, TextInput, FlatList, ActivityIndicator, 
-  TouchableOpacity, Modal, Keyboard, TouchableWithoutFeedback 
+  TouchableOpacity, Modal, Keyboard, TouchableWithoutFeedback , Pressable
 } from "react-native";
 import { ThemedView } from "@/src/components/ThemedView";
 import { ThemedText } from "@/src/components/ThemedText";
@@ -10,6 +10,7 @@ import axios from "axios";
 import FloatingActionButton from "@/src/components/FloatingActionButton";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, Card, Text, Paragraph } from "react-native-paper";
+import { useRouter } from "expo-router";
 
 const tipos = [ "ANIME", "MANGA", "MANHUA", "MANHWA", "SERIE", "FILME", "NOVEL", "LIVRO"];
 
@@ -36,6 +37,8 @@ export function PesquisaScreen() {
   const [novoAutor, setNovoAutor] = useState("");
   const [novoTipo, setNovoTipo] = useState("");
   const [novoGeneros, setNovoGeneros] = useState("");
+
+  const router = useRouter();
 
   useEffect(() => {
     fetchObras();
@@ -115,22 +118,27 @@ export function PesquisaScreen() {
         <ActivityIndicator size="large" color="#6200ee" />
       ) : (
         <FlatList
-          style={styles.flatlist}
-          showsVerticalScrollIndicator={false}
-          data={filteredObras}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <Card style={styles.obraItem}>
-              <Card.Content>
-                <Text style={styles.titulo}>{item.titulo}</Text>
-                <Paragraph>{item.descricao}</Paragraph>
-                <Text style={styles.autor}>Autor: {item.autor}</Text>
-                <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
-                <Text style={styles.generos}>Gêneros: {item.generos.join(", ")}</Text>
-              </Card.Content>
-            </Card>
-          )}
-        />
+      style={styles.flatlist}
+      showsVerticalScrollIndicator={false}
+      data={filteredObras}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => (
+        <Pressable 
+          onPress={() => router.push(`/detalhesobra/${item.id}`)}  // Navega para a tela de detalhes com o ID
+          style={styles.obraItem}  // Adicionando estilo no Pressable, se necessário
+        >
+          <Card>
+            <Card.Content>
+              <Text style={styles.titulo}>{item.titulo}</Text>
+              <Paragraph>{item.descricao}</Paragraph>
+              <Text style={styles.autor}>Autor: {item.autor}</Text>
+              <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
+              <Text style={styles.generos}>Gêneros: {item.generos.join(", ")}</Text>
+            </Card.Content>
+          </Card>
+        </Pressable>
+      )}
+    />
       )}
 
       {/* Modal de Filtros */}
