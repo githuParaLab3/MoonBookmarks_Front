@@ -1,54 +1,122 @@
-import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import axios from "axios";
 
-export  function DetalhesBookmarkScreen() {
-  const navigation = useNavigation();
+// Interface para os dados do bookmark
+interface BookmarkDetalhes {
+  id: string;
+  obra: {
+    titulo: string;
+    descricao: string;
+    imagem: string;
+  };
+  usuario: {
+    nome: string;
+  };
+  status: string; // O status agora é uma string que será mapeada
+  progresso: number;
+  comentario: string;
+}
+
+// Mapeando o enum de Status para uma descrição legível
+const statusLabels: { [key: string]: string } = {
+  PLANEJADO: "Planejado",
+  EM_PROGRESSO: "Em progresso",
+  PAUSADO: "Pausado",
+  CONCLUIDO: "Concluído",
+  ABANDONADO: "Abandonado",
+};
+
+export function DetalhesBookmarkScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const { id } = params as { id: string }; // Pegando o parâmetro 'id'
+
+  const [bookmark, setBookmark] = useState<BookmarkDetalhes | null>(null);
+
+  // Função para buscar os detalhes do bookmark na API
+  useEffect(() => {
+    if (id) {
+      axios
+        .get(`https://moonbookmarks-back.onrender.com/bookmarks/${id}`) // URL corrigida
+        .then((response) => {
+          console.log('Dados recebidos:', response.data); // Verifique o que vem no response
+          setBookmark(response.data);
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar detalhes do bookmark:", error);
+          Alert.alert("Erro", "Não foi possível carregar os dados do bookmark.");
+        });
+    }
+  }, [id]);
+
+  // Função para excluir o bookmark
+  const handleExcluirBookmark = async () => {
+    Alert.alert(
+      "Excluir Bookmark",
+      "Tem certeza que deseja excluir este bookmark?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          onPress: async () => {
+            try {
+              await axios.delete(`https://moonbookmarks-back.onrender.com/bookmarks/${id}`);
+              Alert.alert("Bookmark excluído com sucesso!");
+              router.back();
+            } catch (error) {
+              console.error("Erro ao excluir o bookmark:", error);
+              Alert.alert("Erro", "Não foi possível excluir o bookmark.");
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  // Função para editar o bookmark
+  const handleEditarBookmark = () => {
+    // Navegar para a tela de edição do bookmark
+  };
+
+  if (!bookmark) {
+    return <Text>Carregando...</Text>;
+  }
+
+  console.log('Status do bookmark:', bookmark.status);  // Verifique o valor de status no log
 
   return (
     <View style={styles.container}>
-     
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <MaterialIcons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity>
-
-      
-      <Image
-        source={{ uri: "https://via.placeholder.com/300x150" }} // Substituir pela URL real
-        style={styles.image}
-      />
-
-     
-      <Text style={styles.title}>Infinite Level Up Murim</Text>
-      <View style={styles.infoBox}>
-        <MaterialIcons name="menu-book" size={16} color="black" />
-        <Text style={styles.infoText}>Capítulo 257</Text>
-        <Text style={styles.infoText}>• Concluído</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <MaterialIcons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Detalhes do Bookmark</Text>
       </View>
 
-     
-      <Text style={styles.sectionTitle}>Descrição</Text>
-      <View style={styles.divider} />
-      <Text style={styles.description}>
-        From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government, undertaking high-risk black ops missions in exchange for commuted prison sentences.
-      </Text>
-
+      <Image source={{ uri: bookmark.obra.imagem }} style={styles.bookmarkImage} />
+      <Text style={styles.titulo}>{bookmark.obra.titulo}</Text>
+      <Text style={styles.capitulo}>Capítulo: {bookmark.obra.descricao}</Text>
       
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button}>
-          <MaterialIcons name="star" size={30} color="#a78bfa" />
-          <Text style={[styles.buttonText, { color: "#a78bfa" }]}>Inserir em coleção</Text>
+      {/* Verifique o valor de status antes de renderizar */}
+      <Text style={styles.status}>
+        Status: {statusLabels[bookmark.status] || "Status não disponível"}
+      </Text>
+      <Text style={styles.progresso}>Progresso: {bookmark.progresso}%</Text>
+      <Text style={styles.descricao}>{bookmark.comentario}</Text>
+
+      <View style={styles.actions}>
+        <TouchableOpacity style={styles.editButton} onPress={handleEditarBookmark}>
+          <MaterialIcons name="edit" size={20} color="white" />
+          <Text style={styles.editButtonText}>Editar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <MaterialIcons name="edit" size={30} color="#fbbf24" />
-          <Text style={[styles.buttonText, { color: "#fbbf24" }]}>Editar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button}>
-          <MaterialIcons name="delete" size={30} color="#b91c1c" />
-          <Text style={[styles.buttonText, { color: "#b91c1c" }]}>Excluir</Text>
+        <TouchableOpacity style={styles.deleteButton} onPress={handleExcluirBookmark}>
+          <MaterialIcons name="delete" size={20} color="white" />
+          <Text style={styles.deleteButtonText}>Excluir</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -61,59 +129,78 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 16,
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 60,
+  },
   backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    flex: 1,
+    textAlign: "center",
+  },
+  bookmarkImage: {
+    width: "100%",
+    height: 250,
+    borderRadius: 8,
     marginBottom: 16,
   },
-  image: {
-    width: "100%",
-    height: 180,
-    borderRadius: 10,
-  },
-  title: {
-    fontSize: 20,
+  titulo: {
+    fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 10,
-  },
-  infoBox: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 8,
-    borderWidth: 1,
-    borderColor: "#a78bfa",
-    padding: 8,
-    borderRadius: 8,
-  },
-  infoText: {
-    marginLeft: 6,
-    fontSize: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  divider: {
-    height: 2,
-    backgroundColor: "black",
-    width: 40,
     marginBottom: 8,
   },
-  description: {
-    textAlign: "justify",
+  capitulo: {
+    fontSize: 16,
     color: "#666",
+    marginBottom: 8,
   },
-  buttonContainer: {
+  status: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 8,
+  },
+  progresso: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 8,
+  },
+  descricao: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 16,
+  },
+  actions: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+    justifyContent: "space-around",
+    paddingHorizontal: 16,
   },
-  button: {
-    flex: 1,
+  editButton: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    flexDirection: "row",
     alignItems: "center",
   },
-  buttonText: {
-    fontWeight: "bold",
+  editButtonText: {
+    color: "white",
+    marginLeft: 8,
+  },
+  deleteButton: {
+    backgroundColor: "#FF6347",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  deleteButtonText: {
+    color: "white",
+    marginLeft: 8,
   },
 });

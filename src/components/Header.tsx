@@ -6,7 +6,7 @@ export default function Header() {
   const router = useRouter();
 
   const handleNavigateToSettings = () => {
-    router.navigate('/(configuracoes)'); // Ajuste a rota conforme necessário
+    router.navigate('/configuracoes'); // Ajuste a rota conforme necessário
   };
 
   return (

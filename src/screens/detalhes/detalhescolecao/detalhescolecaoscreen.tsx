@@ -39,7 +39,6 @@ export function DetalhesColecaoScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Lista de mangás */}
       <FlatList
         showsVerticalScrollIndicator={false}
         style={styles.flatlist}
