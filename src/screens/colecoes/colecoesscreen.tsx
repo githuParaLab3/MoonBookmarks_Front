@@ -66,7 +66,7 @@ export function ColecoesScreen() {
           renderItem={({ item }) => (
             <View style={styles.collectionItem}>
               <Text style={styles.categoryTitle}>{item.titulo || "Sem título"}</Text>
-              <TouchableOpacity onPress={() => router.navigate("/(detalhescolecao)")}>
+              <TouchableOpacity onPress={() => router.navigate("/detalhescolecao")}>
                 <View style={styles.collectionCard}>
                   <View style={styles.imagePlaceholder}>
                     <Ionicons name="image-outline" size={30} color="gray" />
