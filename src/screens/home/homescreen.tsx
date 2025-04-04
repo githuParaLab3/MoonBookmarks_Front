@@ -29,10 +29,6 @@ export  function HomeScreen() {
           </TouchableOpacity>
         )}
       />
-
-      <TouchableOpacity style={styles.addButton} onPress={() => router.push("/")}>
-        <Ionicons name="add-outline" size={30} color="#fff" />
-      </TouchableOpacity>
     </View>
   );
 }

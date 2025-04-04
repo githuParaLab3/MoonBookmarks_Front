@@ -1,22 +1,26 @@
 import { ThemedView } from "@/src/components/ThemedView";
-import { StyleSheet, FlatList, View, Text, ActivityIndicator, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, FlatList, View, Text, ActivityIndicator, Image, TouchableOpacity, TextInput } from "react-native";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "@/src/components/Header";
 import BotaoColecao from "@/src/components/BotaoColecao";
 import ColecoesScreen from "../colecoes";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons"; // Importando ícones
 
 export function LivrosScreen() {
   const [selectedTab, setSelectedTab] = useState("Bookmarks");
   const [obras, setObras] = useState<any[]>([]);
+  const [filteredObras, setFilteredObras] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
   const router = useRouter();
 
   const fetchObras = async () => {
     try {
       const response = await axios.get("https://moonbookmarks-back.onrender.com/obras");
       setObras(response.data);
+      setFilteredObras(response.data);
       setLoading(false);
     } catch (error) {
       console.error("Erro ao carregar obras:", error);
@@ -28,9 +32,19 @@ export function LivrosScreen() {
     fetchObras();
   }, []);
 
+  useEffect(() => {
+    if (searchText.trim() === "") {
+      setFilteredObras(obras);
+    } else {
+      const filtered = obras.filter((obra) =>
+        obra.titulo.toLowerCase().includes(searchText.toLowerCase())
+      );
+      setFilteredObras(filtered);
+    }
+  }, [searchText, obras]);
+
   const renderObra = ({ item }: { item: any }) => {
     const imageUrl = item.imagem && item.imagem.trim() ? item.imagem : "https://m.media-amazon.com/images/I/81qPzeEO5IL.jpg";
-
 
     return (
       <TouchableOpacity onPress={() => router.navigate('/')} style={styles.obraItem}>
@@ -57,17 +71,31 @@ export function LivrosScreen() {
       />
 
       {selectedTab === "Bookmarks" ? (
-        loading ? (
-          <ActivityIndicator size="large" color="#6200ee" />
-        ) : (
-          <FlatList
-            style={styles.margemFlatlist}
-            data={obras}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderObra}
-            showsVerticalScrollIndicator={false}
-          />
-        )
+        <>
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Pesquisar bookmark..."
+              placeholderTextColor="#999"
+              value={searchText}
+              onChangeText={setSearchText}
+            />
+          </View>
+
+          {loading ? (
+            <ActivityIndicator size="large" color="#6200ee" />
+          ) : (
+            <FlatList
+              style={styles.margemFlatlist}
+              data={filteredObras}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={renderObra}
+              ListEmptyComponent={<Text style={styles.emptyText}>Nenhum bookmark encontrado</Text>}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+        </>
       ) : (
         <ColecoesScreen />
       )}
@@ -82,9 +110,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#8e24aa",
+    borderRadius: 8,
+    backgroundColor: "#fff",
+    marginBottom: 10,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 10,
+    fontSize: 16,
+    color: "#333",
+  },
   margemFlatlist: {
-    
-    width: "80%",
+    width: "90%",
     marginBottom: 10,
     marginTop: 10,
   },
@@ -115,5 +162,11 @@ const styles = StyleSheet.create({
   progresso: {
     fontSize: 14,
     color: "#6200ee",
+  },
+  emptyText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#999",
+    marginTop: 20,
   },
 });

@@ -8,11 +8,12 @@ export function ConfiguracoesScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity>
-
-      <Text style={styles.header}>Configurações</Text>
+      <View style={styles.header}>
+              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={24} color="black" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Configurações</Text>
+        </View>
 
       <TouchableOpacity style={styles.option}>
         <Ionicons name="settings-outline" size={24} color="#9748FF" />
@@ -49,15 +50,18 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   backButton: {
-    position: "absolute",
-    top: 16,
-    left: 16,
+    padding:8,
   },
   header: {
-    fontSize: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 60,
+  },
+  headerTitle: {
+    fontSize: 22,
     fontWeight: "bold",
+    flex: 1,
     textAlign: "center",
-    marginVertical: 40,
   },
   option: {
     flexDirection: "row",

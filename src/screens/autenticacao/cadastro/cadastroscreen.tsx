@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, TextInput, TouchableOpacity, StyleSheet, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import axios from "axios";
 
 export function CadastroScreen() {
   const router = useRouter();
@@ -9,12 +10,29 @@ export function CadastroScreen() {
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = () => {
-    router.navigate('/(tabs)/(home)');
+  const handleRegister = async () => {
+    try {
+      // Envia a requisição de registro para o backend
+      const response = await axios.post("https://moonbookmarks-back.onrender.com/auth/register", {
+        email: email,
+        nome: nickname,
+        senha: password, // Certifique-se de enviar a senha corretamente como "senha"
+      });
+
+      // Verifica se a resposta é bem-sucedida
+      if (response.data === "Usuário registrado com sucesso!") {
+        // Redireciona para a tela de login após o cadastro bem-sucedido
+        router.navigate('/(autenticacao)/(login)');
+      } else {
+        console.error("Erro ao registrar usuário:", response.data);
+      }
+    } catch (error:any) {
+      console.error("Erro no cadastro:", error.response ? error.response.data : error.message);
+    }
   };
 
   const handleLoginRedirect = () => {
-    router.navigate('/(autenticacao)/(login)'); // Ajuste a rota conforme necessário
+    router.navigate('/(autenticacao)/(login)'); // Redireciona para a tela de login
   };
 
   return (

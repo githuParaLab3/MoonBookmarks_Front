@@ -2,14 +2,46 @@ import React, { useState } from "react";
 import { View, TextInput, TouchableOpacity, StyleSheet, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function LoginScreen() {
   const router = useRouter();
-  const [nickname, setNickname] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    router.navigate('/(tabs)/(home)');
+  const handleLogin = async () => {
+    try {
+      // Envia a requisição de login para o backend
+      const response = await axios.post("https://moonbookmarks-back.onrender.com/auth/login", {
+        email: email,
+        senha: password, // Certifique-se de enviar o campo correto "senha" ao invés de "password"
+      });
+
+      // Verifique a resposta recebida
+      console.log("Resposta do login:", response.data); // Aqui você vai ver a estrutura da resposta
+
+      // Já que a resposta é o token diretamente, não precisamos acessar `token`
+      const token = response.data;  // Agora, `response.data` contém diretamente o token
+
+      if (token) {
+        // Armazene o token no AsyncStorage
+        await AsyncStorage.setItem("authToken", token);
+        
+        // Redirecione para a tela principal após login bem-sucedido
+        router.navigate('/(tabs)/(home)');
+      } else {
+        console.error("Token não encontrado na resposta do servidor.");
+      }
+    } catch (error: any) {
+      // Afirmando que o erro é do tipo 'any' para poder acessar 'response' de forma segura
+      if (axios.isAxiosError(error)) {
+        console.error("Erro no login:", error.response ? error.response.data : error.message);
+      } else {
+        console.error("Erro inesperado:", error);
+      }
+      // Exibir um erro para o usuário se houver falha no login
+    }
   };
 
   const handleRegisterRedirect = () => {
@@ -26,15 +58,15 @@ export function LoginScreen() {
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Nickname</Text>
+        <Text style={styles.label}>Email</Text>
         <View style={styles.inputWrapper}>
           <Ionicons name="person-outline" size={20} color="#9748FF" style={styles.icon} />
           <TextInput
             style={styles.input}
-            placeholder="@Seunickname"
+            placeholder="@Seuemail"
             placeholderTextColor="#aaa"
-            value={nickname}
-            onChangeText={setNickname}
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
       </View>
@@ -148,4 +180,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-

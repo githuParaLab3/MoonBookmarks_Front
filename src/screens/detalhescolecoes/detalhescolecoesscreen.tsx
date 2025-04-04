@@ -15,6 +15,7 @@ export function DetalhesColecoesScreen() {
 
   return (
     <View style={styles.container}>
+      
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="black" />
@@ -22,23 +23,25 @@ export function DetalhesColecoesScreen() {
         <Text style={styles.headerTitle}>Coleção</Text>
       </View>
 
+      
       <Text style={styles.title}>Melhores Mangás</Text>
 
+      
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.deleteButton}>
-          <Ionicons name="trash-outline" size={24} color="white" />
+          <Ionicons name="trash-outline" size={20} color="white" />
           <Text style={styles.buttonText}>Excluir</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.editButton}>
-          <Ionicons name="create-outline" size={24} color="white" />
+          <Ionicons name="create-outline" size={20} color="white" />
           <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Lista de mangás */}
       <FlatList
         showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
         style={styles.flatlist}
         data={mangas}
         keyExtractor={(item) => item.id}
@@ -50,7 +53,7 @@ export function DetalhesColecoesScreen() {
               <Text style={styles.mangaChapter}>{item.chapter}</Text>
             </View>
             <TouchableOpacity style={styles.deleteIcon}>
-              <Ionicons name="trash-outline" size={20} color="white" />
+              <Ionicons name="trash-outline" size={18} color="white" />
             </TouchableOpacity>
           </View>
         )}
@@ -61,30 +64,27 @@ export function DetalhesColecoesScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    width:"80%",
     flex: 1,
     backgroundColor: "#fff",
-    padding: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 16,
   },
-  flatlist:{
-    width:"100%",
-  },
   backButton: {
     padding: 8,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     flex: 1,
     textAlign: "center",
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 16,
@@ -93,41 +93,51 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     gap: 16,
-    marginBottom: 24,
+    marginBottom: 20,
   },
   deleteButton: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: "#b71c1c",
+    backgroundColor: "#D32F2F",
   },
   editButton: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: "#fbc02d",
+    backgroundColor: "#FBC02D",
   },
   buttonText: {
     color: "white",
     marginLeft: 8,
     fontWeight: "bold",
+    fontSize: 14,
+  },
+  flatlist: {
+    marginTop: 10,
   },
   mangaItem: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "white",
-    borderColor: "#8e24aa",
+    borderColor: "#9C27B0",
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 12,
-    marginBottom: 8,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   mangaImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
+    width: 55,
+    height: 55,
+    borderRadius: 10,
   },
   mangaText: {
     flex: 1,
@@ -142,8 +152,10 @@ const styles = StyleSheet.create({
     color: "gray",
   },
   deleteIcon: {
-    backgroundColor: "#b71c1c",
+    backgroundColor: "#D32F2F",
     padding: 8,
     borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
