@@ -1,4 +1,4 @@
-import HomeScreen from "@/src/screens/home";
+import HomeScreen from "@/src/screens/tabs/home";
 
 export default function Index() {
   return (

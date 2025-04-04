@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-export  function DetalhesBookmarksScreen() {
+export  function DetalhesBookmarkScreen() {
   const navigation = useNavigation();
 
   return (

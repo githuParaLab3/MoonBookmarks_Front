@@ -1,5 +1,5 @@
 
-import { PesquisaScreen } from "@/src/screens/pesquisa/pesquisascreen";
+import { PesquisaScreen } from "@/src/screens/tabs/pesquisa/pesquisascreen";
 
 export default function Index() {
   return (

@@ -3,15 +3,16 @@ import { ThemedView } from "@/src/components/ThemedView";
 import { StyleSheet } from 'react-native';
 import { useState } from "react";
 import { ThemedText } from "@/src/components/ThemedText";
-import BotaoColecao from "@/src/components/BotaoColecao";
+import DetalhesBookmarksScreen from "../detalhes/detalhesbookmark";
 import Header from "@/src/components/Header";
-import DetalhesColecoesScreen from "../detalhescolecoes";
-export function ComicsScreen() {
+
+
+export function AudiovisualSreen() {
 
   return (
-    <ThemedView style={styles.container}> 
+    <ThemedView style={styles.container}>   
 
-      <Header/>
+    <Header/>
 
     </ThemedView>
   );

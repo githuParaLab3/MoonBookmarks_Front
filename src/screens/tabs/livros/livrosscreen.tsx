@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "@/src/components/Header";
 import BotaoColecao from "@/src/components/BotaoColecao";
-import ColecoesScreen from "../colecoes";
+import ColecoesScreen from "../../colecoes";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"; // Importando ícones
 

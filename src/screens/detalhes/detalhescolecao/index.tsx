@@ -1,0 +1,1 @@
+export {DetalhesColecaoScreen as default} from './detalhescolecaoscreen'

@@ -8,7 +8,7 @@ export function TelaInicialScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.topSection} />
-      <Image source={require("../../../assets/images/logo.png")} style={styles.logo} />
+      <Image source={require("../../../../assets/images/logo.png")} style={styles.logo} />
       <Text style={styles.title}>Moon Bookmarks</Text>
       <Text style={styles.subtitle}>O seu aplicativo de bookmarks</Text>
 

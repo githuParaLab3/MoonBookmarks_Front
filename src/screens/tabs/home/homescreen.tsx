@@ -23,7 +23,7 @@ export  function HomeScreen() {
         data={collections}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.collectionItem} onPress={() => router.push(`/`)}>
+          <TouchableOpacity style={styles.collectionItem} onPress={() => router.push(`/(detalhesobra)`)}>
             <Ionicons name={item.icon as any} size={24} color="#8A42F5" />
             <Text style={styles.collectionText}>{item.name}</Text>
           </TouchableOpacity>

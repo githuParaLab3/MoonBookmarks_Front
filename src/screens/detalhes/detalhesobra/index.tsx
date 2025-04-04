@@ -1,0 +1,1 @@
+export {DetalhesObraScreen as default} from './detalhesobras'

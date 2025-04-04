@@ -10,7 +10,7 @@ const mangas = Array(6).fill({
   image: "https://example.com/manga-image.jpg",
 });
 
-export function DetalhesColecoesScreen() {
+export function DetalhesColecaoScreen() {
   const navigation = useNavigation();
 
   return (
