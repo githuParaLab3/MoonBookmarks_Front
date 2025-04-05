@@ -1,20 +1,40 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  TextInput,
+  ActivityIndicator,
+  Modal,
+  Image,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { useRouter } from "expo-router";
+import FloatingActionButton from "@/src/components/FloatingActionButton";
+import * as ImagePicker from "expo-image-picker";
 
 export function ColecoesScreen() {
-  const [collections, setCollections] = useState<any[]>([]);  // Lista de coleções
-  const [filteredCollections, setFilteredCollections] = useState<any[]>([]);  // Coleções filtradas
-  const [searchText, setSearchText] = useState("");  // Texto de pesquisa
-  const [loading, setLoading] = useState(true);  // Estado de carregamento
+  const [collections, setCollections] = useState<any[]>([]);
+  const [filteredCollections, setFilteredCollections] = useState<any[]>([]);
+  const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [novaColecao, setNovaColecao] = useState({
+    titulo: "",
+    descricao: "",
+    foto: "",
+  });
   const router = useRouter();
 
-  // Função para buscar coleções da API
   const fetchCollections = async () => {
     try {
-      const response = await axios.get("https://moonbookmarks-back.onrender.com/colecoes"); // Ajuste para a URL real da sua API
+      const response = await axios.get("https://moonbookmarks-back.onrender.com/colecoes");
       setCollections(response.data);
       setFilteredCollections(response.data);
       setLoading(false);
@@ -24,12 +44,10 @@ export function ColecoesScreen() {
     }
   };
 
-  // Chama a função de busca de coleções quando o componente for montado
   useEffect(() => {
     fetchCollections();
   }, []);
 
-  // Atualiza as coleções filtradas com base no texto de pesquisa
   useEffect(() => {
     if (searchText.trim() === "") {
       setFilteredCollections(collections);
@@ -40,6 +58,33 @@ export function ColecoesScreen() {
       setFilteredCollections(filtered);
     }
   }, [searchText, collections]);
+
+  const handleCreateCollection = async () => {
+    try {
+      await axios.post("https://moonbookmarks-back.onrender.com/colecoes", {
+        ...novaColecao,
+        usuario: { id: "8fb0fe59-698b-45e3-8fb3-043e984b4e0d" },
+      });
+      setModalVisible(false);
+      setNovaColecao({ titulo: "", descricao: "", foto: "" });
+      fetchCollections();
+    } catch (error) {
+      console.error("Erro ao criar coleção:", error);
+    }
+  };
+
+  const handlePickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true,
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      const base64 = result.assets[0].base64;
+      setNovaColecao({ ...novaColecao, foto: `data:image/jpeg;base64,${base64}` });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -60,21 +105,25 @@ export function ColecoesScreen() {
         <FlatList
           style={styles.flatlist}
           showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}
           data={filteredCollections}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.collectionItem}>
               <Text style={styles.categoryTitle}>{item.titulo || "Sem título"}</Text>
-              <TouchableOpacity onPress={() => router.navigate("/detalhescolecao")}>
+              <TouchableOpacity onPress={() => router.push(`/detalhescolecao/${item.id}`)}>
                 <View style={styles.collectionCard}>
-                  <View style={styles.imagePlaceholder}>
-                    <Ionicons name="image-outline" size={30} color="gray" />
-                  </View>
+                  {item.foto ? (
+                    <Image source={{ uri: item.foto }} style={styles.collectionImage} />
+                  ) : (
+                    <View style={styles.imagePlaceholder}>
+                      <Ionicons name="image-outline" size={30} color="gray" />
+                    </View>
+                  )}
                   <View style={styles.collectionInfo}>
-                    <Text style={styles.collectionTitle}>{item.titulo || "Coleção sem nome"}</Text>
-                    <Text style={styles.collectionItems}>{item.bookmarks?.length || 0} obras na lista</Text>
-                    <Text style={styles.collectionType}>Tipo: {item.tipo || "Desconhecido"}</Text>
+                    <Text style={styles.collectionTitle}>{item.titulo}</Text>
+                    <Text style={styles.collectionItems}>
+                      {item.bookmarks?.length || 0} obras na lista
+                    </Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -83,6 +132,56 @@ export function ColecoesScreen() {
           ListEmptyComponent={<Text style={styles.emptyText}>Nenhuma coleção encontrada</Text>}
         />
       )}
+
+      <FloatingActionButton onPress={() => setModalVisible(true)} />
+
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <Pressable style={styles.bottomSheetContainer} onPress={() => setModalVisible(false)}>
+          <KeyboardAvoidingView
+            style={styles.bottomSheet}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            onStartShouldSetResponder={() => true}
+          >
+            <Text style={styles.modalTitle}>Nova Coleção</Text>
+            <TextInput
+              placeholder="Título"
+              style={styles.modalInput}
+              value={novaColecao.titulo}
+              onChangeText={(text) => setNovaColecao({ ...novaColecao, titulo: text })}
+            />
+            <TextInput
+              placeholder="Descrição"
+              style={styles.modalInput}
+              value={novaColecao.descricao}
+              onChangeText={(text) => setNovaColecao({ ...novaColecao, descricao: text })}
+            />
+            <TouchableOpacity style={styles.imagePickerButton} onPress={handlePickImage}>
+              <Ionicons name="image" size={20} color="white" />
+              <Text style={styles.imagePickerText}>Escolher Imagem</Text>
+            </TouchableOpacity>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: "#ccc" }]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={[styles.modalButtonText, { color: "#333" }]}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: "#9748FF" }]}
+                onPress={handleCreateCollection}
+              >
+                <Text style={styles.modalButtonText}>Criar</Text>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -99,7 +198,7 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: "#9C27B0",
+    borderColor: "#9748FF",
     borderRadius: 8,
     backgroundColor: "#fff",
     marginBottom: 20,
@@ -117,54 +216,108 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   collectionItem: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
   categoryTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginVertical: 10,
+    marginBottom: 6,
+    color: "#333",
   },
   collectionCard: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#9C27B0",
-    borderRadius: 8,
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
     padding: 12,
-    marginBottom: 8,
-    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   imagePlaceholder: {
-    width: 50,
-    height: 50,
-    backgroundColor: "#F0F0F0",
+    width: 60,
+    height: 60,
+    backgroundColor: "#f0f0f0",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 8,
   },
+  collectionImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    resizeMode: "cover",
+  },
   collectionInfo: {
     marginLeft: 12,
+    flex: 1,
   },
   collectionTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+    display: "none", // Removido do card para evitar repetição
   },
   collectionItems: {
     fontSize: 14,
-    color: "gray",
-  },
-  collectionType: {
-    fontSize: 14,
-    color: "gray",
+    color: "#555",
   },
   emptyText: {
     textAlign: "center",
     fontSize: 16,
     color: "#999",
     marginTop: 20,
+  },
+  bottomSheetContainer: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
+  bottomSheet: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  imagePickerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#9748FF",
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  imagePickerText: {
+    color: "white",
+    marginLeft: 8,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 12,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    marginHorizontal: 4,
+    alignItems: "center",
+  },
+  modalButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
