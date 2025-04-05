@@ -40,11 +40,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   sectionTitle: {
+    textAlign:"center",
     fontSize: 20,
     fontWeight: "bold",
     color: "#8A42F5",
     marginBottom: 10,
-    marginTop:60
+    marginTop:70
   },
   collectionItem: {
     flexDirection: "row",

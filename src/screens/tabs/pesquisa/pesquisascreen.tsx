@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#fff",
   },
   bottomModalContainer: {
     flex: 1,
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#EDEDED",
+    backgroundColor: "#fff",
     borderRadius: 12,
     paddingHorizontal: 10,
     flex: 1,
