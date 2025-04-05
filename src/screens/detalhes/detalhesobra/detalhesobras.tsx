@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,13 +8,15 @@ import {
   Alert,
   TextInput,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
-import ModalScreen from "@/src/components/ModalScreen"; // ajuste o caminho se necessário
+import ModalScreen from "@/src/components/ModalScreen";
+import { Picker } from "@react-native-picker/picker";
 
-// Interface para os dados da obra
 interface ObraDetalhes {
   id: string;
   titulo: string;
@@ -38,27 +40,37 @@ export function DetalhesObraScreen() {
   const [obra, setObra] = useState<ObraDetalhes | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
   const [editData, setEditData] = useState<ObraDetalhes | null>(null);
+  const [isCriarBookmarkVisible, setCriarBookmarkVisible] = useState(false);
+  const [progresso, setProgresso] = useState("");
+  const [status, setStatus] = useState("");
+  const [comentario, setComentario] = useState("");
 
   useEffect(() => {
     if (id) {
       axios
         .get(`https://moonbookmarks-back.onrender.com/obras/${id}`)
-        .then((response) => {
-          setObra(response.data);
-        })
+        .then((response) => setObra(response.data))
         .catch(() => {
           Alert.alert("Erro", "Não foi possível carregar os dados da obra.");
         });
     }
   }, [id]);
 
-  const handleCriarBookmark = async () => {
+  const handleSubmitBookmark = async () => {
     try {
       await axios.post("https://moonbookmarks-back.onrender.com/bookmarks", {
-        usuarioId: "8fb0fe59-698b-45e3-8fb3-043e984b4e0d",
-        obraId: id,
+        obra: { id },
+        usuario: { id: "8fb0fe59-698b-45e3-8fb3-043e984b4e0d" },
+        progresso: Number(progresso),
+        status,
+        comentario: comentario || null,
+        colecoes: null,
       });
       Alert.alert("Sucesso", "Bookmark criada com sucesso!");
+      setCriarBookmarkVisible(false);
+      setProgresso("");
+      setStatus("PLANEJADO");
+      setComentario("");
     } catch (error) {
       Alert.alert("Erro", "Não foi possível criar a bookmark.");
     }
@@ -102,9 +114,7 @@ export function DetalhesObraScreen() {
     }
   };
 
-  if (!obra) {
-    return <Text>Carregando...</Text>;
-  }
+  if (!obra) return <Text>Carregando...</Text>;
 
   const tipoFormatado = formatarTipo(obra.tipo);
   const generos = obra.generos.length > 0 ? obra.generos.join(", ") : "Sem gêneros";
@@ -126,7 +136,7 @@ export function DetalhesObraScreen() {
       <Text style={styles.autor}>Autor: {obra.autor}</Text>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.bookmarkButton} onPress={handleCriarBookmark}>
+        <TouchableOpacity style={styles.bookmarkButton} onPress={() => setCriarBookmarkVisible(true)}>
           <Ionicons name="bookmark-outline" size={20} color="white" />
           <Text style={styles.buttonText}>Bookmark</Text>
         </TouchableOpacity>
@@ -142,62 +152,43 @@ export function DetalhesObraScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* MODAL DE EDIÇÃO */}
-      <ModalScreen isVisible={isModalVisible} onClose={() => setModalVisible(false)} title="Editar Obra">
-        <ScrollView>
-          {editData && (
-            <>
-              <Text>Título</Text>
-              <TextInput
-                value={editData.titulo}
-                onChangeText={(text) => setEditData({ ...editData, titulo: text })}
-                style={styles.input}
-              />
+      {/* Modal personalizado para criar bookmark */}
+      <ModalScreen isVisible={isCriarBookmarkVisible} onClose={() => setCriarBookmarkVisible(false)} title="Nova Bookmark">
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
+          <ScrollView>
+            <TextInput
+              placeholder="Progresso (ex: 5)"
+              value={progresso}
+              onChangeText={setProgresso}
+              keyboardType="numeric"
+              style={styles.input}
+            />
 
-              <Text>Descrição</Text>
-              <TextInput
-                value={editData.descricao}
-                onChangeText={(text) => setEditData({ ...editData, descricao: text })}
-                style={styles.input}
-                multiline
-              />
+            <View style={styles.pickerContainer}>
+              <Text style={{ marginBottom: 5 }}>Status</Text>
+              <Picker selectedValue={status} onValueChange={setStatus}>
+                <Picker.Item label="Selecione o status" value="" />
+                <Picker.Item label="Planejado" value="PLANEJADO" />
+                <Picker.Item label="Em progresso" value="EM_PROGRESSO" />
+                <Picker.Item label="Pausado" value="PAUSADO" />
+                <Picker.Item label="Concluído" value="CONCLUIDO" />
+                <Picker.Item label="Abandonado" value="ABANDONADO" />
+              </Picker>
+            </View>
 
-              <Text>Imagem (URL)</Text>
-              <TextInput
-                value={editData.imagem}
-                onChangeText={(text) => setEditData({ ...editData, imagem: text })}
-                style={styles.input}
-              />
+            <TextInput
+              placeholder="Comentário (opcional)"
+              value={comentario}
+              onChangeText={setComentario}
+              multiline
+              style={[styles.input, { height: 80 }]}
+            />
 
-              <Text>Autor</Text>
-              <TextInput
-                value={editData.autor}
-                onChangeText={(text) => setEditData({ ...editData, autor: text })}
-                style={styles.input}
-              />
-
-              <Text>Tipo (LIVRO, MANGA, ANIME)</Text>
-              <TextInput
-                value={editData.tipo}
-                onChangeText={(text) => setEditData({ ...editData, tipo: text.toUpperCase() })}
-                style={styles.input}
-              />
-
-              <Text>Gêneros (separados por vírgula)</Text>
-              <TextInput
-                value={editData.generos.join(", ")}
-                onChangeText={(text) =>
-                  setEditData({ ...editData, generos: text.split(",").map((g) => g.trim()) })
-                }
-                style={styles.input}
-              />
-
-              <TouchableOpacity style={[styles.editButton, { marginTop: 20 }]} onPress={handleSalvarEdicao}>
-                <Text style={styles.buttonText}>Salvar Alterações</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </ScrollView>
+            <TouchableOpacity style={[styles.bookmarkButton, { alignSelf: "center" }]} onPress={handleSubmitBookmark}>
+              <Text style={styles.buttonText}>Criar</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </ModalScreen>
     </View>
   );
@@ -286,12 +277,16 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     marginLeft: 8,
+    fontWeight: "bold",
   },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 6,
     padding: 10,
+    marginBottom: 10,
+  },
+  pickerContainer: {
     marginBottom: 10,
   },
 });
