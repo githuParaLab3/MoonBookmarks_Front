@@ -1,8 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+  TextInput,
+  ScrollView,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
+import ModalScreen from "@/src/components/ModalScreen"; // ajuste o caminho se necessário
 
 // Interface para os dados da obra
 interface ObraDetalhes {
@@ -11,84 +21,101 @@ interface ObraDetalhes {
   descricao: string;
   imagem: string;
   autor: string;
-  tipo: string;  // Agora tipo é uma string (valor do enum)
-  generos: string[]; // Gêneros da obra
+  tipo: string;
+  generos: string[];
 }
 
-// Função para exibir o tipo de forma legível, caso seja necessário
 const formatTipo = (tipo: string) => {
   switch (tipo) {
-    case 'LIVRO':
-      return 'Livro';
-    case 'MANGA':
-      return 'Mangá';
-    case 'ANIME':
-      return 'Anime';
+    case "LIVRO":
+      return "Livro";
+    case "MANGA":
+      return "Mangá";
+    case "ANIME":
+      return "Anime";
     default:
-      return tipo;  // Caso o tipo seja inesperado, retornamos o valor original
+      return tipo;
   }
-}
+};
 
 export function DetalhesObraScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { id } = params as { id: string }; // Pegando o parâmetro 'id'
+  const { id } = params as { id: string };
 
   const [obra, setObra] = useState<ObraDetalhes | null>(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [editData, setEditData] = useState<ObraDetalhes | null>(null);
 
-  // Função para buscar os detalhes da obra na API
   useEffect(() => {
     if (id) {
       axios
-        .get(`https://moonbookmarks-back.onrender.com/obras/${id}`) // URL corrigida
+        .get(`https://moonbookmarks-back.onrender.com/obras/${id}`)
         .then((response) => {
-          console.log('Dados recebidos:', response.data); // Verifique o que vem no response
           setObra(response.data);
         })
-        .catch((error) => {
-          console.error("Erro ao buscar detalhes da obra:", error);
+        .catch(() => {
           Alert.alert("Erro", "Não foi possível carregar os dados da obra.");
         });
     }
   }, [id]);
 
-  // Função para excluir a obra
-  const handleExcluirObra = async () => {
-    Alert.alert(
-      "Excluir Obra",
-      "Tem certeza que deseja excluir esta obra?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          onPress: async () => {
-            try {
-              await axios.delete(`https://moonbookmarks-back.onrender.com/obras/${id}`);
-              Alert.alert("Obra excluída com sucesso!");
-              router.back();
-            } catch (error) {
-              console.error("Erro ao excluir a obra:", error);
-              Alert.alert("Erro", "Não foi possível excluir a obra.");
-            }
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+  const handleCriarBookmark = async () => {
+    try {
+      await axios.post("https://moonbookmarks-back.onrender.com/bookmarks", {
+        usuarioId: "8fb0fe59-698b-45e3-8fb3-043e984b4e0d",
+        obraId: id,
+      });
+      Alert.alert("Sucesso", "Bookmark criada com sucesso!");
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível criar a bookmark.");
+    }
   };
 
-  // Função para editar a obra
+  const handleExcluirObra = async () => {
+    Alert.alert("Excluir Obra", "Tem certeza que deseja excluir esta obra?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Excluir",
+        onPress: async () => {
+          try {
+            await axios.delete(`https://moonbookmarks-back.onrender.com/obras/${id}`);
+            Alert.alert("Obra excluída com sucesso!");
+            router.back();
+          } catch (error) {
+            Alert.alert("Erro", "Não foi possível excluir a obra.");
+          }
+        },
+      },
+    ]);
+  };
+
   const handleEditarObra = () => {
-    ; // Navegar para a tela de edição da obra
+    if (obra) {
+      setEditData({ ...obra });
+      setModalVisible(true);
+    }
+  };
+
+  const handleSalvarEdicao = async () => {
+    if (!editData) return;
+
+    try {
+      await axios.put(`https://moonbookmarks-back.onrender.com/obras/${editData.id}`, editData);
+      setObra(editData);
+      setModalVisible(false);
+      Alert.alert("Sucesso", "Obra atualizada com sucesso!");
+    } catch (error) {
+      Alert.alert("Erro", "Erro ao atualizar a obra.");
+    }
   };
 
   if (!obra) {
     return <Text>Carregando...</Text>;
   }
 
-  // Formatação do tipo para exibição
   const tipoFormatado = formatTipo(obra.tipo);
-  const generos = Array.isArray(obra.generos) && obra.generos.length > 0 ? obra.generos.join(", ") : "Sem gêneros";
+  const generos = obra.generos.length > 0 ? obra.generos.join(", ") : "Sem gêneros";
 
   return (
     <View style={styles.container}>
@@ -107,16 +134,79 @@ export function DetalhesObraScreen() {
       <Text style={styles.autor}>Autor: {obra.autor}</Text>
 
       <View style={styles.actions}>
+        <TouchableOpacity style={styles.bookmarkButton} onPress={handleCriarBookmark}>
+          <Ionicons name="bookmark-outline" size={20} color="white" />
+          <Text style={styles.buttonText}>Bookmark</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.editButton} onPress={handleEditarObra}>
           <Ionicons name="pencil-outline" size={20} color="white" />
-          <Text style={styles.editButtonText}>Editar</Text>
+          <Text style={styles.buttonText}>Editar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.deleteButton} onPress={handleExcluirObra}>
           <Ionicons name="trash-outline" size={20} color="white" />
-          <Text style={styles.deleteButtonText}>Excluir</Text>
+          <Text style={styles.buttonText}>Excluir</Text>
         </TouchableOpacity>
       </View>
+
+      {/* MODAL DE EDIÇÃO */}
+      <ModalScreen isVisible={isModalVisible} onClose={() => setModalVisible(false)} title="Editar Obra">
+        <ScrollView>
+          {editData && (
+            <>
+              <Text>Título</Text>
+              <TextInput
+                value={editData.titulo}
+                onChangeText={(text) => setEditData({ ...editData, titulo: text })}
+                style={styles.input}
+              />
+
+              <Text>Descrição</Text>
+              <TextInput
+                value={editData.descricao}
+                onChangeText={(text) => setEditData({ ...editData, descricao: text })}
+                style={styles.input}
+                multiline
+              />
+
+              <Text>Imagem (URL)</Text>
+              <TextInput
+                value={editData.imagem}
+                onChangeText={(text) => setEditData({ ...editData, imagem: text })}
+                style={styles.input}
+              />
+
+              <Text>Autor</Text>
+              <TextInput
+                value={editData.autor}
+                onChangeText={(text) => setEditData({ ...editData, autor: text })}
+                style={styles.input}
+              />
+
+              <Text>Tipo (LIVRO, MANGA, ANIME)</Text>
+              <TextInput
+                value={editData.tipo}
+                onChangeText={(text) => setEditData({ ...editData, tipo: text.toUpperCase() })}
+                style={styles.input}
+              />
+
+              <Text>Gêneros (separados por vírgula)</Text>
+              <TextInput
+                value={editData.generos.join(", ")}
+                onChangeText={(text) =>
+                  setEditData({ ...editData, generos: text.split(",").map((g) => g.trim()) })
+                }
+                style={styles.input}
+              />
+
+              <TouchableOpacity style={[styles.editButton, { marginTop: 20 }]} onPress={handleSalvarEdicao}>
+                <Text style={styles.buttonText}>Salvar Alterações</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </ScrollView>
+      </ModalScreen>
     </View>
   );
 }
@@ -130,7 +220,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 60,
+    marginBottom: 20,
   },
   backButton: {
     padding: 8,
@@ -175,7 +265,15 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: "row",
     justifyContent: "space-around",
+    marginTop: 20,
+  },
+  bookmarkButton: {
+    backgroundColor: "#6200EA",
+    paddingVertical: 10,
     paddingHorizontal: 16,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
   },
   editButton: {
     backgroundColor: "#4CAF50",
@@ -185,10 +283,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  editButtonText: {
-    color: "white",
-    marginLeft: 8,
-  },
   deleteButton: {
     backgroundColor: "#FF6347",
     paddingVertical: 10,
@@ -197,8 +291,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  deleteButtonText: {
+  buttonText: {
     color: "white",
     marginLeft: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 6,
+    padding: 10,
+    marginBottom: 10,
   },
 });
