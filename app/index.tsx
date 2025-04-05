@@ -1,5 +1,5 @@
 
-import TelaInicialScreen from "@/src/screens/tabs/telainicial";
+import TelaInicialScreen from "@/src/screens/telainicial";
 
 export default function Index() {
   return (

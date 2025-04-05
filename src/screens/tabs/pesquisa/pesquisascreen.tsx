@@ -1,8 +1,16 @@
 import { useState, useEffect } from "react";
 import {
-  StyleSheet, View, TextInput, FlatList, ActivityIndicator,
-  TouchableOpacity, Modal, Keyboard, TouchableWithoutFeedback,
-  Pressable, Image
+  StyleSheet,
+  View,
+  TextInput,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+  Modal,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Pressable,
+  Image,
 } from "react-native";
 import { ThemedView } from "@/src/components/ThemedView";
 import { ThemedText } from "@/src/components/ThemedText";
@@ -14,7 +22,16 @@ import { Button, Card, Text, Paragraph } from "react-native-paper";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 
-const tipos = ["ANIME", "MANGA", "MANHUA", "MANHWA", "SERIE", "FILME", "NOVEL", "LIVRO"];
+const tipos = [
+  "ANIME",
+  "MANGA",
+  "MANHUA",
+  "MANHWA",
+  "SERIE",
+  "FILME",
+  "NOVEL",
+  "LIVRO",
+];
 
 interface Obra {
   id: number;
@@ -50,7 +67,9 @@ export function PesquisaScreen() {
 
   const fetchObras = async () => {
     try {
-      const response = await axios.get("https://moonbookmarks-back.onrender.com/obras");
+      const response = await axios.get(
+        "https://moonbookmarks-back.onrender.com/obras"
+      );
       setObras(response.data);
     } catch (error) {
       console.error("Erro ao obter as obras:", error);
@@ -78,7 +97,14 @@ export function PesquisaScreen() {
   };
 
   const adicionarObra = async () => {
-    if (!novoTitulo || !novaDescricao || !novoAutor || !novoTipo || !novoGeneros || !imagemBase64) {
+    if (
+      !novoTitulo ||
+      !novaDescricao ||
+      !novoAutor ||
+      !novoTipo ||
+      !novoGeneros ||
+      !imagemBase64
+    ) {
       alert("Preencha todos os campos e selecione uma imagem!");
       return;
     }
@@ -93,7 +119,10 @@ export function PesquisaScreen() {
     };
 
     try {
-      await axios.post("https://moonbookmarks-back.onrender.com/obras", novaObra);
+      await axios.post(
+        "https://moonbookmarks-back.onrender.com/obras",
+        novaObra
+      );
       setModalVisible(false);
       fetchObras();
       setNovoTitulo("");
@@ -112,8 +141,12 @@ export function PesquisaScreen() {
       (obra.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
         obra.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
         obra.descricao.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedTipo === "" || obra.tipo.toLowerCase() === selectedTipo.toLowerCase()) &&
-      (generoFilter === "" || obra.generos.some((genero) => genero.toLowerCase().includes(generoFilter.toLowerCase())))
+      (selectedTipo === "" ||
+        obra.tipo.toLowerCase() === selectedTipo.toLowerCase()) &&
+      (generoFilter === "" ||
+        obra.generos.some((genero) =>
+          genero.toLowerCase().includes(generoFilter.toLowerCase())
+        ))
   );
 
   return (
@@ -122,7 +155,12 @@ export function PesquisaScreen() {
 
       <View style={styles.searchContainer}>
         <View style={styles.inputContainer}>
-          <Ionicons name="search" size={20} color="#9748FF" style={styles.icon} />
+          <Ionicons
+            name="search"
+            size={20}
+            color="#9748FF"
+            style={styles.icon}
+          />
           <TextInput
             style={styles.searchInput}
             placeholder="Pesquisar..."
@@ -130,7 +168,7 @@ export function PesquisaScreen() {
             onChangeText={setSearchTerm}
             placeholderTextColor="#777"
           />
-          <TouchableOpacity onPress={() => setFilterModalVisible(true)} >
+          <TouchableOpacity onPress={() => setFilterModalVisible(true)}>
             <Ionicons name="options-outline" size={24} color="#9748FF" />
           </TouchableOpacity>
         </View>
@@ -142,32 +180,45 @@ export function PesquisaScreen() {
         <ActivityIndicator size="large" color="#6200ee" />
       ) : (
         <FlatList
-  style={styles.flatlist}
-  showsVerticalScrollIndicator={false}
-  data={filteredObras}
-  keyExtractor={(item) => item.id.toString()}
-  renderItem={({ item }) => (
-    <Pressable onPress={() => router.push(`/detalhesobra/${item.id}`)} style={styles.obraItem}>
-      <Card style={{ elevation: 2, borderRadius: 10 }}>
-        <Card.Content style={styles.cardContent}>
-          <Image source={{ uri: `data:image/jpeg;base64,${item.imagem}` }} style={styles.obraImage} />
-          <View style={styles.obraInfo}>
-            <Text style={styles.titulo}>{item.titulo}</Text>
-            <Paragraph numberOfLines={2} style={styles.descricao}>{item.descricao}</Paragraph>
-            <Text style={styles.autor}>Autor: {item.autor}</Text>
-            <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
-            <Text style={styles.generos}>Gêneros: {item.generos.join(", ")}</Text>
-          </View>
-        </Card.Content>
-      </Card>
-    </Pressable>
-  )}
-/>
-
+          style={styles.flatlist}
+          showsVerticalScrollIndicator={false}
+          data={filteredObras}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => router.push(`/detalhesobra/${item.id}`)}
+              style={styles.obraItem}
+            >
+              <Card style={{ elevation: 2, borderRadius: 10 }}>
+                <Card.Content style={styles.cardContent}>
+                  <Image
+                    source={{ uri: `data:image/jpeg;base64,${item.imagem}` }}
+                    style={styles.obraImage}
+                  />
+                  <View style={styles.obraInfo}>
+                    <Text style={styles.titulo}>{item.titulo}</Text>
+                    <Paragraph numberOfLines={2} style={styles.descricao}>
+                      {item.descricao}
+                    </Paragraph>
+                    <Text style={styles.autor}>Autor: {item.autor}</Text>
+                    <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
+                    <Text style={styles.generos}>
+                      Gêneros: {item.generos.join(", ")}
+                    </Text>
+                  </View>
+                </Card.Content>
+              </Card>
+            </Pressable>
+          )}
+        />
       )}
 
       {/* Modal de Filtros */}
-      <Modal visible={filterModalVisible} animationType="slide" transparent={true}>
+      <Modal
+        visible={filterModalVisible}
+        animationType="slide"
+        transparent={true}
+      >
         <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
@@ -181,14 +232,26 @@ export function PesquisaScreen() {
                 placeholderTextColor="#777"
               />
 
-              <Picker selectedValue={selectedTipo} style={styles.picker} onValueChange={setSelectedTipo}>
+              <Picker
+                selectedValue={selectedTipo}
+                style={styles.picker}
+                onValueChange={setSelectedTipo}
+              >
                 <Picker.Item label="Selecione o tipo de obra" value="" />
                 {tipos.map((tipo) => (
-                  <Picker.Item key={tipo} label={tipo} value={tipo.toLowerCase()} />
+                  <Picker.Item
+                    key={tipo}
+                    label={tipo}
+                    value={tipo.toLowerCase()}
+                  />
                 ))}
               </Picker>
 
-              <Button mode="contained" onPress={() => setFilterModalVisible(false)} style={{ backgroundColor: "#9748FF" }}>
+              <Button
+                mode="contained"
+                onPress={() => setFilterModalVisible(false)}
+                style={{ backgroundColor: "#9748FF" }}
+              >
                 Aplicar Filtros
               </Button>
             </View>
@@ -205,30 +268,72 @@ export function PesquisaScreen() {
               <View style={styles.bottomModal}>
                 <Text style={styles.modalTitle}>Adicionar Nova Obra</Text>
 
-                <TextInput style={styles.modalInput} placeholder="Título" value={novoTitulo} onChangeText={setNovoTitulo} />
-                <TextInput style={styles.modalInput} placeholder="Descrição" value={novaDescricao} onChangeText={setNovaDescricao} />
-                <TextInput style={styles.modalInput} placeholder="Autor" value={novoAutor} onChangeText={setNovoAutor} />
-                <TextInput style={styles.modalInput} placeholder="Gêneros (separados por vírgula)" value={novoGeneros} onChangeText={setNovoGeneros} />
+                <TextInput
+                  style={styles.modalInput}
+                  placeholder="Título"
+                  value={novoTitulo}
+                  onChangeText={setNovoTitulo}
+                />
+                <TextInput
+                  style={styles.modalInput}
+                  placeholder="Descrição"
+                  value={novaDescricao}
+                  onChangeText={setNovaDescricao}
+                />
+                <TextInput
+                  style={styles.modalInput}
+                  placeholder="Autor"
+                  value={novoAutor}
+                  onChangeText={setNovoAutor}
+                />
+                <TextInput
+                  style={styles.modalInput}
+                  placeholder="Gêneros (separados por vírgula)"
+                  value={novoGeneros}
+                  onChangeText={setNovoGeneros}
+                />
 
-                <Picker selectedValue={novoTipo} style={styles.picker} onValueChange={setNovoTipo}>
+                <Picker
+                  selectedValue={novoTipo}
+                  style={styles.picker}
+                  onValueChange={setNovoTipo}
+                >
                   <Picker.Item label="Selecione o tipo de obra" value="" />
                   {tipos.map((tipo) => (
-                    <Picker.Item key={tipo} label={tipo} value={tipo.toUpperCase()} />
+                    <Picker.Item
+                      key={tipo}
+                      label={tipo}
+                      value={tipo.toUpperCase()}
+                    />
                   ))}
                 </Picker>
 
-                <Button mode="outlined" onPress={escolherImagem} style={{ marginBottom: 10, borderColor: "#9748FF" }}>
+                <Button
+                  mode="outlined"
+                  onPress={escolherImagem}
+                  style={{ marginBottom: 10, borderColor: "#9748FF" }}
+                >
                   Selecionar Imagem
                 </Button>
 
                 {imagemBase64 && (
                   <Image
                     source={{ uri: `data:image/jpeg;base64,${imagemBase64}` }}
-                    style={{ width: 100, height: 100, alignSelf: "center", marginBottom: 10, borderRadius: 8 }}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      alignSelf: "center",
+                      marginBottom: 10,
+                      borderRadius: 8,
+                    }}
                   />
                 )}
 
-                <Button mode="contained" onPress={adicionarObra} style={{ backgroundColor: "#9748FF" }}>
+                <Button
+                  mode="contained"
+                  onPress={adicionarObra}
+                  style={{ backgroundColor: "#9748FF" }}
+                >
                   Adicionar
                 </Button>
               </View>
@@ -238,21 +343,22 @@ export function PesquisaScreen() {
       </Modal>
     </ThemedView>
   );
-}const styles = StyleSheet.create({
+}
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
     backgroundColor: "#F5F5F5",
   },
-  bottomModalContainer: { 
-    flex: 1, 
+  bottomModalContainer: {
+    flex: 1,
     justifyContent: "flex-end",
   },
-  bottomModal: { 
-    backgroundColor: "#FFFFFF", 
-    padding: 20, 
-    borderTopLeftRadius: 15, 
-    borderTopRightRadius: 15, 
+  bottomModal: {
+    backgroundColor: "#FFFFFF",
+    padding: 20,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.2,
