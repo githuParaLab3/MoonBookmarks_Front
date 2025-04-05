@@ -202,11 +202,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: "#FFFFFF",
     marginBottom: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
   },
   searchIcon: {
     marginRight: 10,
@@ -237,11 +232,13 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: "#E0E0E0",
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
+
+    // Removendo completamente a sombra
+    shadowColor: "transparent",
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 0,
   },
   imagePlaceholder: {
     width: 72,
@@ -286,11 +283,13 @@ const styles = StyleSheet.create({
     padding: 24,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 6,
+
+    // Removendo sombra do bottom sheet
+    shadowColor: "transparent",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
   },
   modalTitle: {
     fontSize: 20,

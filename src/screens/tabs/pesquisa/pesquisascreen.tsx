@@ -86,7 +86,7 @@ export function PesquisaScreen() {
     }
 
     const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       base64: true,
       quality: 0.7,
     });
@@ -95,6 +95,12 @@ export function PesquisaScreen() {
       setImagemBase64(resultado.assets[0].base64 || null);
     }
   };
+
+  const formatarTipo = (tipo: string | null | undefined) => {
+    if (!tipo) return "Tipo desconhecido";
+    return tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase();
+  };
+  
 
   const adicionarObra = async () => {
     if (
@@ -136,19 +142,25 @@ export function PesquisaScreen() {
     }
   };
 
-  const filteredObras = obras.filter(
-    (obra) =>
-      (obra.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        obra.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        obra.descricao.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedTipo === "" ||
-        obra.tipo.toLowerCase() === selectedTipo.toLowerCase()) &&
+  const filteredObras = obras.filter((obra) => {
+    const titulo = obra.titulo ?? "";
+    const autor = obra.autor ?? "";
+    const descricao = obra.descricao ?? "";
+    const tipo = obra.tipo ?? "";
+    const generos = obra.generos ?? [];
+  
+    return (
+      (titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        descricao.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (selectedTipo === "" || tipo.toLowerCase() === selectedTipo.toLowerCase()) &&
       (generoFilter === "" ||
-        obra.generos.some((genero) =>
-          genero.toLowerCase().includes(generoFilter.toLowerCase())
+        generos.some((genero) =>
+          (genero ?? "").toLowerCase().includes(generoFilter.toLowerCase())
         ))
-  );
-
+    );
+  });
+  
   return (
     <ThemedView style={styles.container}>
       <FloatingActionButton onPress={() => setModalVisible(true)} />
@@ -201,7 +213,7 @@ export function PesquisaScreen() {
                       {item.descricao}
                     </Paragraph>
                     <Text style={styles.autor}>Autor: {item.autor}</Text>
-                    <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
+                    <Text style={styles.tipo}>Tipo: {formatarTipo(item.tipo)}</Text>
                     <Text style={styles.generos}>
                       Gêneros: {item.generos.join(", ")}
                     </Text>
@@ -241,7 +253,7 @@ export function PesquisaScreen() {
                 {tipos.map((tipo) => (
                   <Picker.Item
                     key={tipo}
-                    label={tipo}
+                    label={formatarTipo(tipo)}
                     value={tipo.toLowerCase()}
                   />
                 ))}
@@ -302,7 +314,7 @@ export function PesquisaScreen() {
                   {tipos.map((tipo) => (
                     <Picker.Item
                       key={tipo}
-                      label={tipo}
+                      label={formatarTipo(tipo)}
                       value={tipo.toUpperCase()}
                     />
                   ))}

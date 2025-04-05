@@ -25,17 +25,9 @@ interface ObraDetalhes {
   generos: string[];
 }
 
-const formatTipo = (tipo: string) => {
-  switch (tipo) {
-    case "LIVRO":
-      return "Livro";
-    case "MANGA":
-      return "Mangá";
-    case "ANIME":
-      return "Anime";
-    default:
-      return tipo;
-  }
+const formatarTipo = (tipo: string | null | undefined) => {
+  if (!tipo) return "Tipo desconhecido";
+  return tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase();
 };
 
 export function DetalhesObraScreen() {
@@ -114,7 +106,7 @@ export function DetalhesObraScreen() {
     return <Text>Carregando...</Text>;
   }
 
-  const tipoFormatado = formatTipo(obra.tipo);
+  const tipoFormatado = formatarTipo(obra.tipo);
   const generos = obra.generos.length > 0 ? obra.generos.join(", ") : "Sem gêneros";
 
   return (
