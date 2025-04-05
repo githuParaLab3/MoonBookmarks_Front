@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#8A42F5",
     marginBottom: 10,
-    marginTop:70
+    marginTop:30
   },
   collectionItem: {
     flexDirection: "row",

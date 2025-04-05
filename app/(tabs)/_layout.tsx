@@ -12,10 +12,11 @@ export default function TabLayout() {
       <View style={{ flex: 1 }}>
         <Tabs
           screenOptions={{
-            tabBarActiveTintColor: '#FFC107',
-            tabBarInactiveTintColor: '#FFFFFF',
+            tabBarActiveTintColor: '#FFD700', // Amarelo mais vibrante
+            tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.7)', // Branco semi-transparente
             tabBarStyle: styles.tabBar,
             tabBarLabelStyle: styles.tabBarLabel,
+            tabBarItemStyle: styles.tabBarItem,
             headerShown: false,
           }}
         >
@@ -55,17 +56,25 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#9748FF',
-    height: 65,
+    height: 80,
     position: 'absolute',
+    borderTopWidth: 0,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     shadowColor: '#000',
+    shadowOffset: { width: 0, height: -5 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 5,
-    paddingBottom: 10,
+    elevation: 10,
+    paddingHorizontal: 20,
+  },
+  tabBarItem: {
+    paddingVertical: 8,
   },
   tabBarLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    paddingBottom: 5,
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: -5,
+    marginBottom: 5,
   },
 });
