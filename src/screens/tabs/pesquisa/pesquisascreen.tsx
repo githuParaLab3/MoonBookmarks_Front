@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { 
-  StyleSheet, View, TextInput, FlatList, ActivityIndicator, 
-  TouchableOpacity, Modal, Keyboard, TouchableWithoutFeedback , Pressable
+import {
+  StyleSheet, View, TextInput, FlatList, ActivityIndicator,
+  TouchableOpacity, Modal, Keyboard, TouchableWithoutFeedback,
+  Pressable, Image
 } from "react-native";
 import { ThemedView } from "@/src/components/ThemedView";
 import { ThemedText } from "@/src/components/ThemedText";
@@ -11,8 +12,9 @@ import FloatingActionButton from "@/src/components/FloatingActionButton";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, Card, Text, Paragraph } from "react-native-paper";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 
-const tipos = [ "ANIME", "MANGA", "MANHUA", "MANHWA", "SERIE", "FILME", "NOVEL", "LIVRO"];
+const tipos = ["ANIME", "MANGA", "MANHUA", "MANHWA", "SERIE", "FILME", "NOVEL", "LIVRO"];
 
 interface Obra {
   id: number;
@@ -21,6 +23,7 @@ interface Obra {
   autor: string;
   tipo: string;
   generos: string[];
+  imagem: string;
 }
 
 export function PesquisaScreen() {
@@ -37,6 +40,7 @@ export function PesquisaScreen() {
   const [novoAutor, setNovoAutor] = useState("");
   const [novoTipo, setNovoTipo] = useState("");
   const [novoGeneros, setNovoGeneros] = useState("");
+  const [imagemBase64, setImagemBase64] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -48,16 +52,34 @@ export function PesquisaScreen() {
     try {
       const response = await axios.get("https://moonbookmarks-back.onrender.com/obras");
       setObras(response.data);
-      setLoading(false);
     } catch (error) {
       console.error("Erro ao obter as obras:", error);
+    } finally {
       setLoading(false);
     }
   };
 
+  const escolherImagem = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permissão para acessar a galeria foi negada.");
+      return;
+    }
+
+    const resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true,
+      quality: 0.7,
+    });
+
+    if (!resultado.canceled && resultado.assets.length > 0) {
+      setImagemBase64(resultado.assets[0].base64 || null);
+    }
+  };
+
   const adicionarObra = async () => {
-    if (!novoTitulo || !novaDescricao || !novoAutor || !novoTipo || !novoGeneros) {
-      alert("Preencha todos os campos!");
+    if (!novoTitulo || !novaDescricao || !novoAutor || !novoTipo || !novoGeneros || !imagemBase64) {
+      alert("Preencha todos os campos e selecione uma imagem!");
       return;
     }
 
@@ -67,6 +89,7 @@ export function PesquisaScreen() {
       autor: novoAutor,
       tipo: novoTipo.toUpperCase(),
       generos: novoGeneros.split(",").map((g) => g.trim()),
+      imagem: imagemBase64,
     };
 
     try {
@@ -78,6 +101,7 @@ export function PesquisaScreen() {
       setNovoAutor("");
       setNovoTipo("");
       setNovoGeneros("");
+      setImagemBase64(null);
     } catch (error) {
       console.error("Erro ao adicionar obra:", error);
     }
@@ -118,32 +142,30 @@ export function PesquisaScreen() {
         <ActivityIndicator size="large" color="#6200ee" />
       ) : (
         <FlatList
-      style={styles.flatlist}
-      showsVerticalScrollIndicator={false}
-      data={filteredObras}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <Pressable 
-          onPress={() => router.push(`/detalhesobra/${item.id}`)}  // Navega para a tela de detalhes com o ID
-          style={styles.obraItem}  // Adicionando estilo no Pressable, se necessário
-        >
-          <Card>
-            <Card.Content>
-              <Text style={styles.titulo}>{item.titulo}</Text>
-              <Paragraph>{item.descricao}</Paragraph>
-              <Text style={styles.autor}>Autor: {item.autor}</Text>
-              <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
-              <Text style={styles.generos}>Gêneros: {item.generos.join(", ")}</Text>
-            </Card.Content>
-          </Card>
-        </Pressable>
-      )}
-    />
+          style={styles.flatlist}
+          showsVerticalScrollIndicator={false}
+          data={filteredObras}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <Pressable onPress={() => router.push(`/detalhesobra/${item.id}`)} style={styles.obraItem}>
+              <Card>
+                <Card.Content>
+                  <Image source={{ uri: `data:image/jpeg;base64,${item.imagem}` }} style={styles.obraImage} />
+                  <Text style={styles.titulo}>{item.titulo}</Text>
+                  <Paragraph>{item.descricao}</Paragraph>
+                  <Text style={styles.autor}>Autor: {item.autor}</Text>
+                  <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
+                  <Text style={styles.generos}>Gêneros: {item.generos.join(", ")}</Text>
+                </Card.Content>
+              </Card>
+            </Pressable>
+          )}
+        />
       )}
 
       {/* Modal de Filtros */}
       <Modal visible={filterModalVisible} animationType="slide" transparent={true}>
-        <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)} >
+        <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Filtrar Obras</Text>
@@ -159,11 +181,11 @@ export function PesquisaScreen() {
               <Picker selectedValue={selectedTipo} style={styles.picker} onValueChange={setSelectedTipo}>
                 <Picker.Item label="Selecione o tipo de obra" value="" />
                 {tipos.map((tipo) => (
-                  <Picker.Item key={tipo} label={tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase()} value={tipo.toLowerCase()} />
+                  <Picker.Item key={tipo} label={tipo} value={tipo.toLowerCase()} />
                 ))}
               </Picker>
 
-              <Button mode="contained" onPress={() => setFilterModalVisible(false)} style={{backgroundColor:"#9748FF"}}>
+              <Button mode="contained" onPress={() => setFilterModalVisible(false)} style={{ backgroundColor: "#9748FF" }}>
                 Aplicar Filtros
               </Button>
             </View>
@@ -171,36 +193,49 @@ export function PesquisaScreen() {
         </TouchableWithoutFeedback>
       </Modal>
 
-      {/* Modal de Criação de Obra */}
+      {/* Modal de Criação (Bottom Sheet) */}
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
           <View style={styles.bottomModalContainer}>
-            <View style={styles.bottomModal}>
-              <Text style={styles.modalTitle}>Adicionar Nova Obra</Text>
+            <View style={styles.modalContainer} />
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.bottomModal}>
+                <Text style={styles.modalTitle}>Adicionar Nova Obra</Text>
 
-              <TextInput style={styles.modalInput} placeholder="Título" value={novoTitulo} onChangeText={setNovoTitulo} />
-              <TextInput style={styles.modalInput} placeholder="Descrição" value={novaDescricao} onChangeText={setNovaDescricao} />
-              <TextInput style={styles.modalInput} placeholder="Autor" value={novoAutor} onChangeText={setNovoAutor} />
-              <TextInput style={styles.modalInput} placeholder="Gêneros (separados por vírgula)" value={novoGeneros} onChangeText={setNovoGeneros} />
+                <TextInput style={styles.modalInput} placeholder="Título" value={novoTitulo} onChangeText={setNovoTitulo} />
+                <TextInput style={styles.modalInput} placeholder="Descrição" value={novaDescricao} onChangeText={setNovaDescricao} />
+                <TextInput style={styles.modalInput} placeholder="Autor" value={novoAutor} onChangeText={setNovoAutor} />
+                <TextInput style={styles.modalInput} placeholder="Gêneros (separados por vírgula)" value={novoGeneros} onChangeText={setNovoGeneros} />
 
-              <Picker selectedValue={novoTipo} style={styles.picker} onValueChange={setNovoTipo}>
-                <Picker.Item label="Selecione o tipo de obra" value="" />
-                {tipos.map((tipo) => (
-                  <Picker.Item key={tipo} label={tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase()} value={tipo.toUpperCase()} />
-                ))}
-              </Picker>
+                <Picker selectedValue={novoTipo} style={styles.picker} onValueChange={setNovoTipo}>
+                  <Picker.Item label="Selecione o tipo de obra" value="" />
+                  {tipos.map((tipo) => (
+                    <Picker.Item key={tipo} label={tipo} value={tipo.toUpperCase()} />
+                  ))}
+                </Picker>
 
-              <Button mode="contained" onPress={adicionarObra} style={{backgroundColor:"#9748FF"}}>
-                Adicionar
-              </Button>
-            </View>
+                <Button mode="outlined" onPress={escolherImagem} style={{ marginBottom: 10, borderColor: "#9748FF" }}>
+                  Selecionar Imagem
+                </Button>
+
+                {imagemBase64 && (
+                  <Image
+                    source={{ uri: `data:image/jpeg;base64,${imagemBase64}` }}
+                    style={{ width: 100, height: 100, alignSelf: "center", marginBottom: 10, borderRadius: 8 }}
+                  />
+                )}
+
+                <Button mode="contained" onPress={adicionarObra} style={{ backgroundColor: "#9748FF" }}>
+                  Adicionar
+                </Button>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
     </ThemedView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -221,6 +256,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
+  },
+  obraImage: {
+    width: "100%",
+    height: 250,
+    borderRadius: 12,
+    resizeMode: "cover",
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    backgroundColor: "#f0f0f0",
   },
   searchContainer: {
     flexDirection: "row",

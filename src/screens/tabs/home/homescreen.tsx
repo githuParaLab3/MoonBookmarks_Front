@@ -1,14 +1,9 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import Header from "@/src/components/Header";
+import ColecoesScreen from "../../colecoes";
 
-const collections = [
-  { id: "1", name: "Mangás", icon: "book-outline" },
-  { id: "2", name: "HQs", icon: "library-outline" },
-  { id: "3", name: "Favoritos", icon: "heart-outline" },
-];
 
 export  function HomeScreen() {
   const router = useRouter();
@@ -19,16 +14,7 @@ export  function HomeScreen() {
 
       <Text style={styles.sectionTitle}>Suas Coleções</Text>
 
-      <FlatList
-        data={collections}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.collectionItem} onPress={() => router.navigate(`/`)}>
-            <Ionicons name={item.icon as any} size={24} color="#8A42F5" />
-            <Text style={styles.collectionText}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
+      <ColecoesScreen/>
     </View>
   );
 }

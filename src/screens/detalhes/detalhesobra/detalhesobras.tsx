@@ -126,7 +126,7 @@ export function DetalhesObraScreen() {
         <Text style={styles.headerTitle}>Detalhes da Obra</Text>
       </View>
 
-      <Image source={{ uri: obra.imagem }} style={styles.obraImage} />
+      <Image source={{ uri: `data:image/jpeg;base64,${obra.imagem}` }} style={styles.obraImage} />
       <Text style={styles.titulo}>{obra.titulo}</Text>
       <Text style={styles.descricao}>{obra.descricao}</Text>
       <Text style={styles.tipo}>Tipo: {tipoFormatado}</Text>
