@@ -11,9 +11,9 @@ const MAPPING = {
   'gear': 'settings',
   'magnifyingglass': 'search',
   'film': 'movie',
-  'book.fill': 'library-books',
-  'paintbrush': 'brush'
-  
+  'book.fill': 'book', // Alterando para 'book' para refletir o ícone correto do MaterialIcons
+  'paintbrush': 'brush',
+  'bookmark.fill': 'bookmark', // Mapeando o 'bookmark.fill' corretamente para o ícone do MaterialIcons
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],

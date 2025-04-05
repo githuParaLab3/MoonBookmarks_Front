@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { useRouter } from "expo-router";
 import Header from "@/src/components/Header";
-import ColecoesScreen from "../../colecoes";
+import ColecoesScreen from "@/src/components/colecoesscreen";
 
 
 export  function HomeScreen() {

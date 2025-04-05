@@ -8,17 +8,15 @@ type TabIconProps = {
 
 export default function TabLayout() {
   return (
-    <View style={{ flex: 1}}>
-      
-      <View style={{ flex: 1}}> 
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <Tabs
           screenOptions={{
             tabBarActiveTintColor: '#FFC107',
             tabBarInactiveTintColor: '#FFFFFF',
             tabBarStyle: styles.tabBar,
             tabBarLabelStyle: styles.tabBarLabel,
-            headerShown: false, 
-            
+            headerShown: false,
           }}
         >
           <Tabs.Screen
@@ -40,29 +38,11 @@ export default function TabLayout() {
             }}
           />
           <Tabs.Screen
-            name="(comics)"
+            name="(bookmarks)"
             options={{
-              title: 'Comics',
+              title: 'Bookmarks',
               tabBarIcon: ({ color }: TabIconProps) => (
-                <IconSymbol size={28} name="paintbrush" color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="(livros)"
-            options={{
-              title: 'Livros',
-              tabBarIcon: ({ color }: TabIconProps) => (
-                <IconSymbol size={28} name="book.fill" color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="(audiovisual)"
-            options={{
-              title: 'Vídeo',
-              tabBarIcon: ({ color }: TabIconProps) => (
-                <IconSymbol size={28} name="film" color={color} />
+                <IconSymbol size={28} name="bookmark.fill" color={color} />
               ),
             }}
           />
@@ -72,14 +52,11 @@ export default function TabLayout() {
   );
 }
 
-
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#9748FF',
     height: 65,
- 
     position: 'absolute',
-
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,

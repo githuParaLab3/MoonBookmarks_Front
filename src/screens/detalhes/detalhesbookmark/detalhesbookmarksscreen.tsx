@@ -126,7 +126,7 @@ export function DetalhesBookmarkScreen() {
       <Text style={styles.titulo}>{bookmark.obra.titulo}</Text>
       <Text style={styles.capitulo}>Capítulo: {bookmark.obra.descricao}</Text>
       <Text style={styles.status}>Status: {statusLabels[bookmark.status]}</Text>
-      <Text style={styles.progresso}>Progresso: {bookmark.progresso}%</Text>
+      <Text style={styles.progresso}>Progresso: {bookmark.progresso}</Text>
       <Text style={styles.descricao}>{bookmark.comentario}</Text>
 
       {/* Ações */}

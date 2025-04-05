@@ -1,1 +1,0 @@
-export {ColecoesScreen as default} from './colecoesscreen'

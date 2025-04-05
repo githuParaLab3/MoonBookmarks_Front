@@ -19,7 +19,7 @@ import { useRouter } from "expo-router";
 import FloatingActionButton from "@/src/components/FloatingActionButton";
 import * as ImagePicker from "expo-image-picker";
 
-export function ColecoesScreen() {
+export default function ColecoesScreen() {
   const [collections, setCollections] = useState<any[]>([]);
   const [filteredCollections, setFilteredCollections] = useState<any[]>([]);
   const [searchText, setSearchText] = useState("");

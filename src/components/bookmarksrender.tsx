@@ -16,7 +16,7 @@ const status = [
   "ABANDONADO"
 ];
 
-export function BookmarksScreen() {
+export default function BookmarksRenderScreen() {
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [filteredBookmarks, setFilteredBookmarks] = useState<any[]>([]);
   const [searchText, setSearchText] = useState(""); 
