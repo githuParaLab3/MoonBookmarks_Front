@@ -75,7 +75,7 @@ export function ColecoesScreen() {
 
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       base64: true,
       quality: 0.7,
     });
@@ -133,7 +133,7 @@ export function ColecoesScreen() {
         />
       )}
 
-      <FloatingActionButton onPress={() => setModalVisible(true)} style={{ bottom: 56, right: 5 }}/>
+      <FloatingActionButton onPress={() => setModalVisible(true)} style={{ bottom: 80, right: 5 }}/>
 
       <Modal
         visible={modalVisible}

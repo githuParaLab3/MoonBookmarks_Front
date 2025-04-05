@@ -11,22 +11,8 @@ export function ComicsScreen() {
 const [selectedTab, setSelectedTab] = useState("Bookmarks");
 
   return (
-    <ThemedView style={{ flex: 1, padding: 20 }}>
-      <Header />
-      <BotaoColecao
-        titulo1="Bookmarks"
-        titulo2="Coleções"
-        onPress1={() => setSelectedTab("Bookmarks")}
-        onPress2={() => setSelectedTab("Coleções")}
-        selectedTab={selectedTab}
-      />
-
-      {selectedTab === "Bookmarks" ? (
-        <BookmarksScreen /> 
-      ) : (
-        <ColecoesScreen />
-      )}
-    </ThemedView>
+    <BookmarksScreen /> 
+    
   );
 }
 
