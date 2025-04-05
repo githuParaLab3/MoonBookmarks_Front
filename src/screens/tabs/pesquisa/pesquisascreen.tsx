@@ -163,7 +163,7 @@ export function PesquisaScreen() {
   
   return (
     <ThemedView style={styles.container}>
-      <FloatingActionButton onPress={() => setModalVisible(true)} />
+      <FloatingActionButton onPress={() => setModalVisible(true)} style={{ bottom: 100, right: 24 }}/>
 
       <View style={styles.searchContainer}>
         <View style={styles.inputContainer}>

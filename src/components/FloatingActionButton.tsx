@@ -1,13 +1,15 @@
-import { Pressable, StyleSheet } from "react-native";
+// FloatingActionButton.tsx
+import { Pressable, StyleSheet, ViewStyle } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 type Props = {
   onPress: () => void;
+  style?: ViewStyle; // <- estilo externo opcional
 };
 
-export default function FloatingActionButton({ onPress }: Props) {
+export default function FloatingActionButton({ onPress, style }: Props) {
   return (
-    <Pressable style={styles.fab} onPress={onPress}>
+    <Pressable style={[styles.fab, style]} onPress={onPress}>
       <MaterialIcons name="add" size={30} color="#fff" />
     </Pressable>
   );
@@ -16,19 +18,19 @@ export default function FloatingActionButton({ onPress }: Props) {
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    bottom: 120, // Distância da borda inferior
-    right: 40,  // Distância da borda direita
-    backgroundColor: "#7A2FF9", // Cor roxa do botão
+    bottom: 40,
+    right: 30,
+    backgroundColor: "#7A2FF9",
     width: 56,
-    zIndex: 100,
     height: 56,
-    borderRadius: 28, // Deixa o botão circular
+    borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 100,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3.84,
-    elevation: 5, // Sombra para Android
+    elevation: 5,
   },
 });

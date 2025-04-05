@@ -133,7 +133,7 @@ export function ColecoesScreen() {
         />
       )}
 
-      <FloatingActionButton onPress={() => setModalVisible(true)} />
+      <FloatingActionButton onPress={() => setModalVisible(true)} style={{ bottom: 56, right: 5 }}/>
 
       <Modal
         visible={modalVisible}
