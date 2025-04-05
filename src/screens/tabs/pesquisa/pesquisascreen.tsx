@@ -142,25 +142,28 @@ export function PesquisaScreen() {
         <ActivityIndicator size="large" color="#6200ee" />
       ) : (
         <FlatList
-          style={styles.flatlist}
-          showsVerticalScrollIndicator={false}
-          data={filteredObras}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <Pressable onPress={() => router.push(`/detalhesobra/${item.id}`)} style={styles.obraItem}>
-              <Card>
-                <Card.Content>
-                  <Image source={{ uri: `data:image/jpeg;base64,${item.imagem}` }} style={styles.obraImage} />
-                  <Text style={styles.titulo}>{item.titulo}</Text>
-                  <Paragraph>{item.descricao}</Paragraph>
-                  <Text style={styles.autor}>Autor: {item.autor}</Text>
-                  <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
-                  <Text style={styles.generos}>Gêneros: {item.generos.join(", ")}</Text>
-                </Card.Content>
-              </Card>
-            </Pressable>
-          )}
-        />
+  style={styles.flatlist}
+  showsVerticalScrollIndicator={false}
+  data={filteredObras}
+  keyExtractor={(item) => item.id.toString()}
+  renderItem={({ item }) => (
+    <Pressable onPress={() => router.push(`/detalhesobra/${item.id}`)} style={styles.obraItem}>
+      <Card style={{ elevation: 2, borderRadius: 10 }}>
+        <Card.Content style={styles.cardContent}>
+          <Image source={{ uri: `data:image/jpeg;base64,${item.imagem}` }} style={styles.obraImage} />
+          <View style={styles.obraInfo}>
+            <Text style={styles.titulo}>{item.titulo}</Text>
+            <Paragraph numberOfLines={2} style={styles.descricao}>{item.descricao}</Paragraph>
+            <Text style={styles.autor}>Autor: {item.autor}</Text>
+            <Text style={styles.tipo}>Tipo: {item.tipo}</Text>
+            <Text style={styles.generos}>Gêneros: {item.generos.join(", ")}</Text>
+          </View>
+        </Card.Content>
+      </Card>
+    </Pressable>
+  )}
+/>
+
       )}
 
       {/* Modal de Filtros */}
@@ -235,8 +238,7 @@ export function PesquisaScreen() {
       </Modal>
     </ThemedView>
   );
-}
-const styles = StyleSheet.create({
+}const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
@@ -256,16 +258,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
-  },
-  obraImage: {
-    width: "100%",
-    height: 250,
-    borderRadius: 12,
-    resizeMode: "cover",
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    backgroundColor: "#f0f0f0",
   },
   searchContainer: {
     flexDirection: "row",
@@ -307,35 +299,51 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   obraItem: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-    borderColor: "#9748FF",
+    marginBottom: 16,
+  },
+  cardContent: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  obraImage: {
+    width: 90,
+    height: 120,
+    borderRadius: 10,
+    resizeMode: "cover",
+    backgroundColor: "#f0f0f0",
     borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  obraInfo: {
+    flex: 1,
+    justifyContent: "flex-start",
   },
   titulo: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#222",
+    color: "#1E1E1E",
+    marginBottom: 4,
+  },
+  descricao: {
+    fontSize: 13,
+    color: "#555",
+    marginBottom: 4,
   },
   autor: {
     fontSize: 12,
     color: "#666",
+    marginBottom: 2,
   },
   tipo: {
     fontSize: 12,
-    color: "#777",
+    color: "#888",
+    marginBottom: 2,
   },
   generos: {
     fontSize: 12,
     color: "#555",
-    marginTop: 5,
+    marginTop: 2,
   },
   modalContainer: {
     flex: 1,
@@ -379,5 +387,3 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
-
-
