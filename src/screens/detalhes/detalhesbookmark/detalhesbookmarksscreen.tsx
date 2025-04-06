@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  TextInput,
+} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
-import ModalScreen from "@/src/components/ModalScreen"; // Caminho do seu modal
+import ModalScreen from "@/src/components/ModalScreen";
+import { Picker } from "@react-native-picker/picker";
 
 interface BookmarkDetalhes {
   id: string;
@@ -40,8 +50,13 @@ export function DetalhesBookmarkScreen() {
 
   const [bookmark, setBookmark] = useState<BookmarkDetalhes | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
   const [colecoes, setColecoes] = useState<Colecao[]>([]);
   const [colecoesDoBookmark, setColecoesDoBookmark] = useState<string[]>([]);
+
+  const [novoStatus, setNovoStatus] = useState("");
+  const [novoProgresso, setNovoProgresso] = useState("");
+  const [novoComentario, setNovoComentario] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -70,7 +85,27 @@ export function DetalhesBookmarkScreen() {
   };
 
   const handleEditarBookmark = () => {
-    // implementar depois
+    if (!bookmark) return;
+    setNovoStatus(bookmark.status);
+    setNovoProgresso(bookmark.progresso.toString());
+    setNovoComentario(bookmark.comentario);
+    setEditModalVisible(true);
+  };
+
+  const salvarEdicao = async () => {
+    try {
+      await axios.put(`https://moonbookmarks-back.onrender.com/bookmarks/${id}`, {
+        status: novoStatus,
+        progresso: Number(novoProgresso),
+        comentario: novoComentario,
+      });
+      Alert.alert("Sucesso", "Bookmark atualizada!");
+      setEditModalVisible(false);
+      const res = await axios.get(`https://moonbookmarks-back.onrender.com/bookmarks/${id}`);
+      setBookmark(res.data);
+    } catch (err) {
+      Alert.alert("Erro", "Não foi possível salvar.");
+    }
   };
 
   const carregarColecoes = async () => {
@@ -124,7 +159,7 @@ export function DetalhesBookmarkScreen() {
       {/* Conteúdo */}
       <Image source={{ uri: `data:image/jpeg;base64,${bookmark.obra.imagem}` }} style={styles.bookmarkImage} />
       <Text style={styles.titulo}>{bookmark.obra.titulo}</Text>
-      <Text style={styles.capitulo}>Capítulo: {bookmark.obra.descricao}</Text>
+      <Text style={styles.capitulo}>{bookmark.obra.descricao}</Text>
       <Text style={styles.status}>Status: {statusLabels[bookmark.status]}</Text>
       <Text style={styles.progresso}>Progresso: {bookmark.progresso}</Text>
       <Text style={styles.descricao}>{bookmark.comentario}</Text>
@@ -166,117 +201,62 @@ export function DetalhesBookmarkScreen() {
           })}
         </ScrollView>
       </ModalScreen>
+
+      {/* Modal de Edição */}
+      <ModalScreen isVisible={editModalVisible} onClose={() => setEditModalVisible(false)} title="Editar Bookmark">
+        <ScrollView contentContainerStyle={{ gap: 12 }}>
+          <Text>Status</Text>
+          <View style={{ borderWidth: 1, borderColor: "#ccc", borderRadius: 6 }}>
+            <Picker selectedValue={novoStatus} onValueChange={setNovoStatus}>
+              {Object.entries(statusLabels).map(([value, label]) => (
+                <Picker.Item key={value} label={label} value={value} />
+              ))}
+            </Picker>
+          </View>
+
+          <Text>Progresso</Text>
+          <TextInput
+            style={{ borderWidth: 1, borderColor: "#ccc", borderRadius: 6, padding: 8 }}
+            value={novoProgresso}
+            onChangeText={setNovoProgresso}
+            keyboardType="numeric"
+          />
+
+          <Text>Comentário</Text>
+          <TextInput
+            style={{ borderWidth: 1, borderColor: "#ccc", borderRadius: 6, padding: 8, height: 100 }}
+            value={novoComentario}
+            onChangeText={setNovoComentario}
+            multiline
+          />
+
+          <TouchableOpacity style={[styles.editButton, { marginTop: 10 }]} onPress={salvarEdicao}>
+            <Text style={{ color: "white", textAlign: "center" }}>Salvar</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </ModalScreen>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-  // Container principal
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 16,
-  },
-
-  // Cabeçalho
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 40,
-  },
-  backButton: {
-    padding: 8,
-  },
-  deleteButtonText: {
-    color: "white",
-    marginLeft: 8,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    flex: 1,
-    textAlign: "center",
-  },
-
-  // Imagem da obra
-  bookmarkImage: {
-    width: "100%",
-    height: 250,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-
-  // Texto principal
-  titulo: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  capitulo: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 8,
-  },
-  status: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 8,
-  },
-  progresso: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 8,
-  },
-  descricao: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 16,
-  },
-
-  // Botões de ação
-  actions: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingHorizontal: 16,
-  },
-  editButton: {
-    backgroundColor: "#4CAF50",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  deleteButton: {
-    backgroundColor: "#FF6347",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  colecaoButton: {
-    backgroundColor: "#3f51b5",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  editButtonText: {
-    color: "white",
-    marginLeft: 8,
-  },
-
-  // Itens do modal de coleções
-  colecaoItem: {
-    padding: 12,
-    borderBottomColor: "#ccc",
-    borderBottomWidth: 1,
-  },
-  colecaoTexto: {
-    fontSize: 16,
-  },
-  colecaoAtiva: {
-    backgroundColor: "#e0f7fa",
-  },
+  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
+  header: { flexDirection: "row", alignItems: "center", marginBottom: 16 },
+  backButton: { marginRight: 8 },
+  headerTitle: { fontSize: 18, fontWeight: "bold" },
+  bookmarkImage: { width: "100%", height: 200, borderRadius: 12, marginBottom: 12 },
+  titulo: { fontSize: 20, fontWeight: "bold", marginBottom: 4 },
+  capitulo: { fontSize: 14, color: "#666", marginBottom: 8 },
+  status: { fontSize: 14, fontWeight: "bold" },
+  progresso: { fontSize: 14, marginBottom: 8 },
+  descricao: { fontSize: 14, fontStyle: "italic", marginBottom: 16 },
+  actions: { flexDirection: "row", justifyContent: "space-around" },
+  editButton: { backgroundColor: "#4CAF50", padding: 10, borderRadius: 8, flexDirection: "row", alignItems: "center", gap: 6 },
+  deleteButton: { backgroundColor: "#F44336", padding: 10, borderRadius: 8, flexDirection: "row", alignItems: "center", gap: 6 },
+  colecaoButton: { backgroundColor: "#2196F3", padding: 10, borderRadius: 8, flexDirection: "row", alignItems: "center", gap: 6 },
+  editButtonText: { color: "white", fontWeight: "bold" },
+  deleteButtonText: { color: "white", fontWeight: "bold" },
+  colecaoItem: { padding: 12, borderBottomWidth: 1, borderColor: "#eee" },
+  colecaoAtiva: { backgroundColor: "#dfefff" },
+  colecaoTexto: { fontSize: 16 },
 });

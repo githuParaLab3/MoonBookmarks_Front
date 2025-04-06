@@ -16,6 +16,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import axios from "axios";
+import * as ImagePicker from "expo-image-picker";
 
 interface Obra {
   id: string;
@@ -47,9 +48,10 @@ export function DetalhesColecaoScreen() {
 
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [novaImagem, setNovaImagem] = useState<string | null>(null);
+
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [search, setSearch] = useState("");
-
   const [filteredBookmarks, setFilteredBookmarks] = useState<Bookmark[]>([]);
 
   const loadColecao = async () => {
@@ -58,7 +60,7 @@ export function DetalhesColecaoScreen() {
       setColecao(res.data);
       setTitulo(res.data.titulo);
       setDescricao(res.data.descricao);
-    } catch (err) {
+    } catch {
       Alert.alert("Erro", "Erro ao carregar a coleção.");
     }
   };
@@ -68,7 +70,7 @@ export function DetalhesColecaoScreen() {
       const res = await axios.get("https://moonbookmarks-back.onrender.com/bookmarks/usuario/8fb0fe59-698b-45e3-8fb3-043e984b4e0d");
       setBookmarks(res.data);
       setFilteredBookmarks(res.data);
-    } catch (err) {
+    } catch {
       Alert.alert("Erro", "Erro ao carregar bookmarks.");
     }
   };
@@ -77,6 +79,33 @@ export function DetalhesColecaoScreen() {
     loadColecao();
     loadBookmarks();
   }, [id]);
+
+  const escolherImagem = async () => {
+    const resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      base64: true,
+      quality: 0.7,
+    });
+
+    if (!resultado.canceled && resultado.assets.length > 0) {
+      setNovaImagem(resultado.assets[0].base64 || null);
+    }
+  };
+
+  const handleEditar = async () => {
+    try {
+      await axios.put(`https://moonbookmarks-back.onrender.com/colecoes/${id}`, {
+        titulo,
+        descricao,
+        foto: novaImagem || colecao?.foto,
+      });
+      setEditModalVisible(false);
+      loadColecao();
+    } catch {
+      Alert.alert("Erro", "Erro ao editar.");
+    }
+  };
 
   const handleExcluirColecao = async () => {
     Alert.alert("Excluir", "Tem certeza que deseja excluir a coleção?", [
@@ -93,19 +122,6 @@ export function DetalhesColecaoScreen() {
         }
       }
     ]);
-  };
-
-  const handleEditar = async () => {
-    try {
-      await axios.put(`https://moonbookmarks-back.onrender.com/colecoes/${id}`, {
-        titulo,
-        descricao,
-      });
-      setEditModalVisible(false);
-      loadColecao();
-    } catch {
-      Alert.alert("Erro", "Erro ao editar.");
-    }
   };
 
   const handleAdicionarBookmark = async (bookmarkId: string) => {
@@ -138,7 +154,6 @@ export function DetalhesColecaoScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={24} />
@@ -146,16 +161,13 @@ export function DetalhesColecaoScreen() {
         <Text style={styles.headerTitle}>Coleção</Text>
       </View>
 
-      {/* Foto da Coleção */}
       {colecao.foto && (
         <Image source={{ uri: `data:image/jpeg;base64,${colecao.foto}` }} style={styles.image} />
       )}
 
-      {/* Infos */}
       <Text style={styles.title}>{colecao.titulo}</Text>
       <Text style={styles.descricao}>{colecao.descricao}</Text>
 
-      {/* Botões */}
       <View style={styles.botoes}>
         <TouchableOpacity style={styles.botaoEditar} onPress={() => setEditModalVisible(true)}>
           <Ionicons name="create-outline" size={20} color="white" />
@@ -171,7 +183,6 @@ export function DetalhesColecaoScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Lista de Bookmarks */}
       {colecao.bookmarks.length === 0 ? (
         <Text style={{ textAlign: "center", marginTop: 20, color: "#777" }}>
           Nenhuma bookmark nessa coleção ainda.
@@ -222,6 +233,19 @@ export function DetalhesColecaoScreen() {
               value={descricao}
               onChangeText={setDescricao}
             />
+
+            {(novaImagem || colecao?.foto) && (
+              <Image
+                source={{ uri: `data:image/jpeg;base64,${novaImagem || colecao?.foto}` }}
+                style={[styles.image, { height: 150, marginBottom: 10 }]}
+              />
+            )}
+
+            <TouchableOpacity style={styles.botaoEditar} onPress={escolherImagem}>
+              <Ionicons name="image-outline" size={20} color="white" />
+              <Text style={styles.botaoTexto}>Trocar Imagem</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.botaoSalvar} onPress={handleEditar}>
               <Text style={{ color: "white", fontWeight: "bold" }}>Salvar</Text>
             </TouchableOpacity>
@@ -270,7 +294,6 @@ export function DetalhesColecaoScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: "#fff" },
   header: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
