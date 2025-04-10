@@ -14,7 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
-import ModalScreen from "@/src/components/ModalCustomizado";
+import ModalCustomizado from "@/src/components/ModalCustomizado";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import styles from "./detahesobras.styles";
@@ -184,7 +184,7 @@ export function DetalhesObraScreen() {
       </View>
 
       {/* Modal para criar bookmark */}
-      <ModalScreen isVisible={isCriarBookmarkVisible} onClose={() => setCriarBookmarkVisible(false)} title="Nova Bookmark">
+      <ModalCustomizado isVisible={isCriarBookmarkVisible} onClose={() => setCriarBookmarkVisible(false)} title="Nova Bookmark">
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
           <Text style={styles.label}>Status</Text>
           <Picker
@@ -222,10 +222,10 @@ export function DetalhesObraScreen() {
             <Text style={styles.buttonText}>Criar</Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>
-      </ModalScreen>
+      </ModalCustomizado>
 
       {/* Modal para editar obra */}
-      <ModalScreen isVisible={isModalVisible} onClose={() => setModalVisible(false)} title="Editar Obra">
+      <ModalCustomizado isVisible={isModalVisible} onClose={() => setModalVisible(false)} title="Editar Obra">
         <ScrollView>
           <Text style={styles.label}>Título</Text>
           <TextInput value={editData?.titulo} onChangeText={(text) => setEditData((prev) => prev && { ...prev, titulo: text })} style={styles.input} />
@@ -274,7 +274,7 @@ export function DetalhesObraScreen() {
             <Text style={styles.buttonText}>Salvar</Text>
           </TouchableOpacity>
         </ScrollView>
-      </ModalScreen>
+      </ModalCustomizado>
     </View>
   );
 }

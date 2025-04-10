@@ -20,6 +20,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useColecoes, useCreateColecao } from "@/src/hooks/useColecoes"; // Usando os hooks personalizados
 import styles from "./homescreen.styles";
 import Header from "@/src/components/Header";
+import ModalCustomizado from "@/src/components/ModalCustomizado";
 
 export function HomeScreen() {
   const [searchText, setSearchText] = useState("");
@@ -32,8 +33,8 @@ export function HomeScreen() {
   const router = useRouter();
 
   // Usando o hook para pegar as coleções
-  const { mutate: createColecao, status: createStatus } = useCreateColecao();  // Aqui estamos pegando a propriedade 'status' da mutação
-  const { data: colecoes, isLoading, error } = useColecoes();  // Assumindo que useColecoes retorne os dados de coleções
+  const { mutate: createColecao, status: createStatus } = useCreateColecao(); // Aqui estamos pegando a propriedade 'status' da mutação
+  const { data: colecoes, isLoading, error } = useColecoes(); // Assumindo que useColecoes retorne os dados de coleções
 
   const handleCreateCollection = () => {
     createColecao({
@@ -53,7 +54,10 @@ export function HomeScreen() {
 
     if (!result.canceled && result.assets.length > 0) {
       const base64 = result.assets[0].base64;
-      setNovaColecao({ ...novaColecao, foto: `data:image/jpeg;base64,${base64}` });
+      setNovaColecao({
+        ...novaColecao,
+        foto: `data:image/jpeg;base64,${base64}`,
+      });
     }
   };
 
@@ -73,9 +77,14 @@ export function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Header/>
+      <Header />
       <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+        <Ionicons
+          name="search"
+          size={20}
+          color="#999"
+          style={styles.searchIcon}
+        />
         <TextInput
           style={styles.searchInput}
           placeholder="Pesquisar coleção..."
@@ -92,11 +101,18 @@ export function HomeScreen() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.collectionItem}>
-            <Text style={styles.categoryTitle}>{item.titulo || "Sem título"}</Text>
-            <TouchableOpacity onPress={() => router.push(`/detalhescolecao/${item.id}`)}>
+            <Text style={styles.categoryTitle}>
+              {item.titulo || "Sem título"}
+            </Text>
+            <TouchableOpacity
+              onPress={() => router.push(`/detalhescolecao/${item.id}`)}
+            >
               <View style={styles.collectionCard}>
                 {item.foto ? (
-                  <Image source={{ uri: item.foto }} style={styles.collectionImage} />
+                  <Image
+                    source={{ uri: item.foto }}
+                    style={styles.collectionImage}
+                  />
                 ) : (
                   <View style={styles.imagePlaceholder}>
                     <Ionicons name="image-outline" size={30} color="gray" />
@@ -112,61 +128,67 @@ export function HomeScreen() {
             </TouchableOpacity>
           </View>
         )}
-        ListEmptyComponent={<Text style={styles.emptyText}>Nenhuma coleção encontrada</Text>}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>Nenhuma coleção encontrada</Text>
+        }
       />
 
-      <FloatingActionButton onPress={() => setModalVisible(true)} style={{ bottom: 100, right: 24 }}/>
+      <FloatingActionButton
+        onPress={() => setModalVisible(true)}
+        style={{ bottom: 100, right: 24 }}
+      />
 
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
+      <ModalCustomizado
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        title="Nova Coleção"
       >
-        <Pressable style={styles.bottomSheetContainer} onPress={() => setModalVisible(false)}>
-          <KeyboardAvoidingView
-            style={styles.bottomSheet}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-            onStartShouldSetResponder={() => true}
-          >
-            <Text style={styles.modalTitle}>Nova Coleção</Text>
-            <TextInput
-              placeholder="Título"
-              style={styles.modalInput}
-              value={novaColecao.titulo}
-              onChangeText={(text) => setNovaColecao({ ...novaColecao, titulo: text })}
-            />
-            <TextInput
-              placeholder="Descrição"
-              style={styles.modalInput}
-              value={novaColecao.descricao}
-              onChangeText={(text) => setNovaColecao({ ...novaColecao, descricao: text })}
-            />
-            <TouchableOpacity style={styles.imagePickerButton} onPress={handlePickImage}>
-              <Ionicons name="image" size={20} color="white" />
-              <Text style={styles.imagePickerText}>Escolher Imagem</Text>
-            </TouchableOpacity>
+        <TextInput
+          placeholder="Título"
+          style={styles.modalInput}
+          value={novaColecao.titulo}
+          onChangeText={(text) =>
+            setNovaColecao({ ...novaColecao, titulo: text })
+          }
+        />
+        <TextInput
+          placeholder="Descrição"
+          style={styles.modalInput}
+          value={novaColecao.descricao}
+          onChangeText={(text) =>
+            setNovaColecao({ ...novaColecao, descricao: text })
+          }
+        />
 
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: "#ccc" }]}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={[styles.modalButtonText, { color: "#333" }]}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: "#9748FF" }]}
-                onPress={handleCreateCollection}
-                disabled={createStatus === "pending"} // Usando o status 'pending' corretamente
-              >
-                <Text style={styles.modalButtonText}>
-                  {createStatus === "pending" ? "Criando..." : "Criar"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </Pressable>
-      </Modal>
+        <TouchableOpacity
+          style={styles.imagePickerButton}
+          onPress={handlePickImage}
+        >
+          <Ionicons name="image" size={20} color="white" />
+          <Text style={styles.imagePickerText}>Escolher Imagem</Text>
+        </TouchableOpacity>
+
+        <View style={styles.modalButtons}>
+          <TouchableOpacity
+            style={[styles.modalButton, { backgroundColor: "#ccc" }]}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={[styles.modalButtonText, { color: "#333" }]}>
+              Cancelar
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.modalButton, { backgroundColor: "#9748FF" }]}
+            onPress={handleCreateCollection}
+            disabled={createStatus === "pending"}
+          >
+            <Text style={styles.modalButtonText}>
+              {createStatus === "pending" ? "Criando..." : "Criar"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ModalCustomizado>
     </View>
   );
 }
