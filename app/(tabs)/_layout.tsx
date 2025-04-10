@@ -56,11 +56,9 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#9748FF',
-    height: 80,
+    height: 70,
     position: 'absolute',
     borderTopWidth: 0,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -5 },
     shadowOpacity: 0.1,

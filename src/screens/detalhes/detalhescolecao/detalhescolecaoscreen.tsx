@@ -72,13 +72,21 @@ export function DetalhesColecaoScreen() {
       const colecaoAtualizada = {
         titulo,
         descricao,
-        foto: novaImagem || colecao.foto,
+        foto: novaImagem || colecao.foto, // Garantindo que a foto seja atualizada se a nova imagem estiver definida
       };
-      updateColecao({ id: colecao.id, colecaoAtualizada });
+  
+      // Chamando a mutação para atualizar a coleção
+      updateColecao({ id: colecao.id, colecaoAtualizada }, {
+        onSuccess: () => {
+          // Refazer a consulta da coleção para garantir que os dados sejam atualizados
+          refetchColecao();
+        },
+      });
+  
       setEditModalVisible(false);
-      refetchColecao();
     }
   };
+  
 
   const handleExcluirColecao = () => {
     Alert.alert("Excluir", "Tem certeza que deseja excluir a coleção?", [

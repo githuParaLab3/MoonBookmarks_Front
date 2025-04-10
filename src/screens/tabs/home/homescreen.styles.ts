@@ -109,6 +109,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
+  imagePreview: {
+    width: 100,
+    height: 100,
+    marginTop: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    resizeMode: "cover",
+  },  
   modalInput: {
     height: 50,
     borderWidth: 1,

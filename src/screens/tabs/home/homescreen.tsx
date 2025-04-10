@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   FlatList,
-  StyleSheet,
   TextInput,
   ActivityIndicator,
   Modal,
   Image,
-  Pressable,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -34,13 +30,28 @@ export function HomeScreen() {
 
   // Usando o hook para pegar as coleções
   const { mutate: createColecao, status: createStatus } = useCreateColecao(); // Aqui estamos pegando a propriedade 'status' da mutação
-  const { data: colecoes, isLoading, error } = useColecoes(); // Assumindo que useColecoes retorne os dados de coleções
+  const { data: colecoes, isLoading, error, refetch } = useColecoes(); // Adicionando o refetch
 
   const handleCreateCollection = () => {
-    createColecao({
-      ...novaColecao,
-      usuario: { id: "8fb0fe59-698b-45e3-8fb3-043e984b4e0d" }, // Aqui você pode ajustar o id do usuário conforme necessário
-    });
+    if (!novaColecao.titulo) {
+      alert("O título da coleção é obrigatório");
+      return;
+    }
+    createColecao(
+      {
+        ...novaColecao,
+        usuario: { id: "8fb0fe59-698b-45e3-8fb3-043e984b4e0d" }, // Aqui você pode ajustar o id do usuário conforme necessário
+      },
+      {
+        onSuccess: () => {
+          // Após a criação da coleção, refetche os dados para atualizar a lista
+          refetch();
+        },
+        onError: () => {
+          alert("Erro ao criar coleção. Tente novamente.");
+        },
+      }
+    );
     setModalVisible(false);
     setNovaColecao({ titulo: "", descricao: "", foto: "" });
   };
@@ -99,35 +110,39 @@ export function HomeScreen() {
         showsVerticalScrollIndicator={false}
         data={filteredCollections}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.collectionItem}>
-            <Text style={styles.categoryTitle}>
-              {item.titulo || "Sem título"}
-            </Text>
-            <TouchableOpacity
-              onPress={() => router.push(`/detalhescolecao/${item.id}`)}
-            >
-              <View style={styles.collectionCard}>
-                {item.foto ? (
-                  <Image
-                    source={{ uri: item.foto }}
-                    style={styles.collectionImage}
-                  />
-                ) : (
-                  <View style={styles.imagePlaceholder}>
-                    <Ionicons name="image-outline" size={30} color="gray" />
+        renderItem={({ item }) => {
+          return (
+            <View style={styles.collectionItem}>
+              <Text style={styles.categoryTitle}>
+                {item.titulo || "Sem título"}
+              </Text>
+              <TouchableOpacity
+                onPress={() => router.push(`/detalhescolecao/${item.id}`)}
+              >
+                <View style={styles.collectionCard}>
+                  {item.foto ? (
+                    <Image
+                      source={{
+                        uri: `data:image/jpeg;base64,${item.foto}`, // Adicionando o prefixo para base64
+                      }}
+                      style={styles.collectionImage}
+                    />
+                  ) : (
+                    <View style={styles.imagePlaceholder}>
+                      <Ionicons name="image-outline" size={30} color="gray" />
+                    </View>
+                  )}
+                  <View style={styles.collectionInfo}>
+                    <Text style={styles.collectionTitle}>{item.titulo}</Text>
+                    <Text style={styles.collectionItems}>
+                      {item.bookmarks?.length || 0} obras na lista
+                    </Text>
                   </View>
-                )}
-                <View style={styles.collectionInfo}>
-                  <Text style={styles.collectionTitle}>{item.titulo}</Text>
-                  <Text style={styles.collectionItems}>
-                    {item.bookmarks?.length || 0} obras na lista
-                  </Text>
                 </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-        )}
+              </TouchableOpacity>
+            </View>
+          );
+        }}
         ListEmptyComponent={
           <Text style={styles.emptyText}>Nenhuma coleção encontrada</Text>
         }
@@ -167,6 +182,13 @@ export function HomeScreen() {
           <Ionicons name="image" size={20} color="white" />
           <Text style={styles.imagePickerText}>Escolher Imagem</Text>
         </TouchableOpacity>
+
+        {novaColecao.foto && (
+          <Image
+            source={{ uri: novaColecao.foto }}
+            style={styles.imagePreview}
+          />
+        )}
 
         <View style={styles.modalButtons}>
           <TouchableOpacity
