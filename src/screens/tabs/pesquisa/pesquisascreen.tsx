@@ -23,6 +23,7 @@ import styles from "./pesquisascreen.styles";
 import { Tipo } from "@/src/types/enums";
 import { Obra } from "@/src/types/obra";
 import { useObras, useCreateObra } from "@/src/hooks/useObras";
+import ModalCustomizado from "@/src/components/ModalCustomizado";
 
 export function PesquisaScreen() {
   // Hook para obter obras usando React Query
@@ -112,25 +113,26 @@ export function PesquisaScreen() {
   };
 
   // Filtrando as obras com base nos estados dos filtros e da busca
-  const filteredObras = obras?.filter((obra) => {
-    const titulo = obra.titulo ?? "";
-    const autor = obra.autor ?? "";
-    const descricao = obra.descricao ?? "";
-    const tipo = obra.tipo ?? "";
-    const generos = obra.generos ?? [];
+  const filteredObras =
+    obras?.filter((obra) => {
+      const titulo = obra.titulo ?? "";
+      const autor = obra.autor ?? "";
+      const descricao = obra.descricao ?? "";
+      const tipo = obra.tipo ?? "";
+      const generos = obra.generos ?? [];
 
-    return (
-      (titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        descricao.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedTipo === "" ||
-        tipo.toLowerCase() === selectedTipo.toLowerCase()) &&
-      (generoFilter === "" ||
-        generos.some((genero) =>
-          (genero ?? "").toLowerCase().includes(generoFilter.toLowerCase())
-        ))
-    );
-  }) || [];
+      return (
+        (titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          descricao.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (selectedTipo === "" ||
+          tipo.toLowerCase() === selectedTipo.toLowerCase()) &&
+        (generoFilter === "" ||
+          generos.some((genero) =>
+            (genero ?? "").toLowerCase().includes(generoFilter.toLowerCase())
+          ))
+      );
+    }) || [];
 
   return (
     <ThemedView style={styles.container}>
@@ -245,82 +247,79 @@ export function PesquisaScreen() {
       </Modal>
 
       {/* Modal de Criação (Bottom Sheet) */}
-      <Modal visible={modalVisible} animationType="slide" transparent={true}>
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View style={styles.bottomModalContainer}>
-            <View style={styles.modalContainer} />
-            <TouchableWithoutFeedback onPress={() => {}}>
-              <View style={styles.bottomModal}>
-                <Text style={styles.modalTitle}>Adicionar Nova Obra</Text>
-                <TextInput
-                  style={styles.modalInput}
-                  placeholder="Título"
-                  value={novoTitulo}
-                  onChangeText={setNovoTitulo}
-                />
-                <TextInput
-                  style={styles.modalInput}
-                  placeholder="Descrição"
-                  value={novaDescricao}
-                  onChangeText={setNovaDescricao}
-                />
-                <TextInput
-                  style={styles.modalInput}
-                  placeholder="Autor"
-                  value={novoAutor}
-                  onChangeText={setNovoAutor}
-                />
-                <TextInput
-                  style={styles.modalInput}
-                  placeholder="Gêneros (separados por vírgula)"
-                  value={novoGeneros}
-                  onChangeText={setNovoGeneros}
-                />
-                <Picker
-                  selectedValue={novoTipo}
-                  style={styles.picker}
-                  onValueChange={setNovoTipo}
-                >
-                  <Picker.Item label="Selecione o tipo de obra" value="" />
-                  {tipos.map((tipo) => (
-                    <Picker.Item
-                      key={tipo}
-                      label={formatarTipo(tipo)}
-                      value={tipo.toUpperCase()}
-                    />
-                  ))}
-                </Picker>
-                <Button
-                  mode="outlined"
-                  onPress={escolherImagem}
-                  style={{ marginBottom: 10, borderColor: "#9748FF" }}
-                >
-                  Selecionar Imagem
-                </Button>
-                {imagemBase64 && (
-                  <Image
-                    source={{ uri: `data:image/jpeg;base64,${imagemBase64}` }}
-                    style={{
-                      width: 100,
-                      height: 100,
-                      alignSelf: "center",
-                      marginBottom: 10,
-                      borderRadius: 8,
-                    }}
-                  />
-                )}
-                <Button
-                  mode="contained"
-                  onPress={adicionarObra}
-                  style={{ backgroundColor: "#9748FF" }}
-                >
-                  Adicionar
-                </Button>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+      <ModalCustomizado
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        title="Adicionar Nova Obra"
+      >
+        <TextInput
+          style={styles.modalInput}
+          placeholder="Título"
+          value={novoTitulo}
+          onChangeText={setNovoTitulo}
+        />
+        <TextInput
+          style={styles.modalInput}
+          placeholder="Descrição"
+          value={novaDescricao}
+          onChangeText={setNovaDescricao}
+        />
+        <TextInput
+          style={styles.modalInput}
+          placeholder="Autor"
+          value={novoAutor}
+          onChangeText={setNovoAutor}
+        />
+        <TextInput
+          style={styles.modalInput}
+          placeholder="Gêneros (separados por vírgula)"
+          value={novoGeneros}
+          onChangeText={setNovoGeneros}
+        />
+        <Picker
+          selectedValue={novoTipo}
+          style={styles.picker}
+          onValueChange={setNovoTipo}
+        >
+          <Picker.Item label="Selecione o tipo de obra" value="" />
+          {tipos.map((tipo) => (
+            <Picker.Item
+              key={tipo}
+              label={formatarTipo(tipo)}
+              value={tipo.toUpperCase()}
+            />
+          ))}
+        </Picker>
+
+        <Button
+          mode="outlined"
+          onPress={escolherImagem}
+          style={{ marginBottom: 10, borderColor: "#9748FF" }}
+        >
+          Selecionar Imagem
+        </Button>
+
+        {imagemBase64 && (
+          <Image
+            source={{ uri: `data:image/jpeg;base64,${imagemBase64}` }}
+            style={{
+              width: 100,
+              height: 100,
+              alignSelf: "center",
+              marginBottom: 10,
+              borderRadius: 8,
+            }}
+          />
+        )}
+
+        <Button
+          mode="contained"
+          onPress={adicionarObra}
+          style={{ backgroundColor: "#9748FF" }}
+        >
+          Adicionar
+        </Button>
+      </ModalCustomizado>
     </ThemedView>
   );
 }

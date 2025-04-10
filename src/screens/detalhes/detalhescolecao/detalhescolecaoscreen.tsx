@@ -6,39 +6,51 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
-  Modal,
-  Pressable,
   Alert,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { useColecaoById, useUpdateColecao, useDeleteColecao } from "@/src/hooks/useColecoes"; // Importando os hooks personalizados
 import * as ImagePicker from "expo-image-picker";
+
+import {
+  useColecaoById,
+  useUpdateColecao,
+  useDeleteColecao,
+} from "@/src/hooks/useColecoes";
+import { useBookmarks } from "@/src/hooks/useBookmarks";
+import { Colecao, Bookmark } from "@/src/types";
+
 import styles from "./detalhescoleca.styles";
 import ModalCustomizado from "@/src/components/ModalCustomizado";
-import { Colecao, Bookmark } from "@/src/types"; // Importando as interfaces globais
 
 export function DetalhesColecaoScreen() {
   const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: colecao, isLoading: isColecaoLoading, refetch: refetchColecao } = useColecaoById(id);
+
+  const {
+    data: colecao,
+    isLoading: isColecaoLoading,
+    refetch: refetchColecao,
+  } = useColecaoById(id);
+  const { data: allBookmarks } = useBookmarks();
   const { mutate: updateColecao } = useUpdateColecao();
   const { mutate: deleteColecao } = useDeleteColecao();
+
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [addBookmarkModalVisible, setAddBookmarkModalVisible] = useState(false);
 
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [novaImagem, setNovaImagem] = useState<string | null>(null);
+
   const [search, setSearch] = useState("");
-  const [filteredBookmarks, setFilteredBookmarks] = useState<Bookmark[]>([]);
 
   useEffect(() => {
     if (colecao) {
       setTitulo(colecao.titulo);
-      setDescricao(colecao.descricao || ""); // Garantir que a descrição seja uma string vazia, caso não exista
+      setDescricao(colecao.descricao || "");
     }
   }, [colecao]);
 
@@ -83,16 +95,17 @@ export function DetalhesColecaoScreen() {
     ]);
   };
 
-  useEffect(() => {
-    if (colecao && colecao.bookmarks) {
-      const filtradas = colecao.bookmarks.filter((bm) =>
-        bm.obra.titulo.toLowerCase().includes(search.toLowerCase())
-      );
-      setFilteredBookmarks(filtradas);
-    }
-  }, [search, colecao]);
+  const bookmarksForaDaColecao =
+    allBookmarks?.filter(
+      (bm) => !(colecao?.bookmarks ?? []).some((b) => b.id === bm.id)
+    ) || [];
 
-  if (isColecaoLoading) return <Text style={{ padding: 20 }}>Carregando...</Text>;
+  const bookmarksFiltrados = bookmarksForaDaColecao.filter((bm) =>
+    bm.obra.titulo.toLowerCase().includes(search.toLowerCase())
+  );
+
+  if (isColecaoLoading)
+    return <Text style={{ padding: 20 }}>Carregando...</Text>;
 
   return (
     <View style={styles.container}>
@@ -128,15 +141,22 @@ export function DetalhesColecaoScreen() {
           <Ionicons name="trash-outline" size={20} color="white" />
           <Text style={styles.botaoTexto}>Excluir</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.botaoAdicionar}
+          onPress={() => setAddBookmarkModalVisible(true)}
+        >
+          <Ionicons name="add-circle-outline" size={20} color="white" />
+          <Text style={styles.botaoTexto}>Bookmark</Text>
+        </TouchableOpacity>
       </View>
 
-      {colecao?.bookmarks && colecao.bookmarks.length === 0 ? (
+      {colecao?.bookmarks?.length === 0 ? (
         <Text style={{ textAlign: "center", marginTop: 20, color: "#777" }}>
           Nenhuma bookmark nessa coleção ainda.
         </Text>
       ) : (
         <FlatList
-          data={colecao?.bookmarks || []}
+          data={colecao?.bookmarks ?? []}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 40 }}
           renderItem={({ item }) => (
@@ -198,6 +218,40 @@ export function DetalhesColecaoScreen() {
             <Text style={{ color: "white", fontWeight: "bold" }}>Salvar</Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>
+      </ModalCustomizado>
+
+      {/* Modal de Adicionar Bookmark */}
+      <ModalCustomizado
+        isVisible={addBookmarkModalVisible}
+        onClose={() => setAddBookmarkModalVisible(false)}
+        title="Adicionar Bookmark"
+      >
+        <TextInput
+          placeholder="Buscar por título..."
+          value={search}
+          onChangeText={setSearch}
+          style={[styles.input, { marginBottom: 12 }]}
+        />
+        <FlatList
+          data={bookmarksFiltrados}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 30 }}
+          renderItem={({ item }) => (
+            <View style={styles.item}>
+              <Image
+                source={{ uri: `data:image/jpeg;base64,${item.obra.imagem}` }}
+                style={styles.itemImage}
+              />
+              <View style={styles.itemInfo}>
+                <Text style={styles.itemTitulo}>{item.obra.titulo}</Text>
+                <Text style={styles.itemProgresso}>
+                  Progresso: {item.progresso}
+                </Text>
+              </View>
+              {/* Você pode adicionar aqui o botão para efetivamente adicionar o bookmark na coleção */}
+            </View>
+          )}
+        />
       </ModalCustomizado>
     </View>
   );
