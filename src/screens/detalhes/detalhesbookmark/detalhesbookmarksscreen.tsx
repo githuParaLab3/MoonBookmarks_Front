@@ -12,7 +12,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
-import ModalScreen from "@/src/components/ModalScreen";
+import ModalCustomizado from "@/src/components/ModalCustomizado";
 import { Picker } from "@react-native-picker/picker";
 import styles from "./detalhesbookmark.styles";
 
@@ -185,7 +185,7 @@ export function DetalhesBookmarkScreen() {
       </View>
 
       {/* Modal de Coleções */}
-      <ModalScreen isVisible={modalVisible} onClose={() => setModalVisible(false)} title="Coleções">
+      <ModalCustomizado isVisible={modalVisible} onClose={() => setModalVisible(false)} title="Coleções">
         <ScrollView>
           {colecoes.map((colecao) => {
             const estaNaColecao = colecoesDoBookmark.includes(colecao.id);
@@ -202,9 +202,9 @@ export function DetalhesBookmarkScreen() {
             );
           })}
         </ScrollView>
-      </ModalScreen>
+      </ModalCustomizado>
 
-      <ModalScreen isVisible={editModalVisible} onClose={() => setEditModalVisible(false)} title="Editar Bookmark">
+      <ModalCustomizado isVisible={editModalVisible} onClose={() => setEditModalVisible(false)} title="Editar Bookmark">
         <ScrollView contentContainerStyle={{ gap: 12 }}>
           <Text>Status</Text>
           <View style={{ borderWidth: 1, borderColor: "#ccc", borderRadius: 6 }}>
@@ -235,7 +235,7 @@ export function DetalhesBookmarkScreen() {
             <Text style={{ color: "white", textAlign: "center" }}>Salvar</Text>
           </TouchableOpacity>
         </ScrollView>
-      </ModalScreen>
+      </ModalCustomizado>
     </View>
   );
 }

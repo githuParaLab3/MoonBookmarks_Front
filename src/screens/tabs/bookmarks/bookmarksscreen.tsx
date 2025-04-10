@@ -48,23 +48,36 @@ export function BookmarksScreen() {
   };
 
   const renderBookmark = ({ item }: { item: any }) => {
-    const title = item.obra?.titulo || "Título não disponível";  
-    const imageUrl = item.obra?.imagem && item.obra.imagem.trim() ? item.obra.imagem : null;
-
-    const isBase64 = (url: string) => url && (url.startsWith('data:image') || url.startsWith('data:application'));
-
-    const imageSource = isBase64(imageUrl)
-      ? { uri: imageUrl }
-      : { uri: "https://m.media-amazon.com/images/I/81qPzeEO5IL.jpg" };
-
+    const title = item.obra?.titulo || "Título não disponível";
+    const rawImage = item.obra?.imagem?.trim() || null;
+  
+    const normalizeBase64 = (image: string | null) => {
+      if (!image) return null;
+      if (image.startsWith("data:image") || image.startsWith("http")) return image;
+      return `data:image/jpeg;base64,${image}`;
+    };
+  
+    const normalizedImage = normalizeBase64(rawImage);
+  
+    const imageSource = normalizedImage
+      ? { uri: normalizedImage }
+      : require("@/assets/images/logo.png"); // substitua com o caminho certo da sua imagem local
+  
     return (
-      <Pressable 
+      <Pressable
         style={styles.bookmarkItem}
-        onPress={() => router.push(`/detalhesbookmark/${item.id}`)} 
+        onPress={() => router.push(`/detalhesbookmark/${item.id}`)}
       >
-        <Image source={imageSource} style={styles.imagem} />
+        <Image
+          source={imageSource}
+          style={styles.imagem}
+          onError={() => console.warn("❌ Erro ao carregar imagem:", normalizedImage)}
+        />
         <View style={styles.textoContainer}>
           <Text style={styles.titulo}>{title}</Text>
+          <Text style={styles.progresso}>
+            Status: {capitalizeFirstLetter(item.status)}
+          </Text>
           <Text style={styles.progresso}>
             Progresso: {item.progresso ? `${item.progresso}` : "Não iniciado"}
           </Text>
@@ -72,7 +85,8 @@ export function BookmarksScreen() {
       </Pressable>
     );
   };
-
+  
+  
   // Verificando se a requisição falhou
   if (isLoading) {
     return <ActivityIndicator size="large" color="#6200ee" />;

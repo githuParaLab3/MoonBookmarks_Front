@@ -14,7 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
-import ModalScreen from "@/src/components/ModalScreen";
+import ModalScreen from "@/src/components/ModalCustomizado";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import styles from "./detahesobras.styles";

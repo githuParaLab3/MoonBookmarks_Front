@@ -16,7 +16,7 @@ type Props = PropsWithChildren<{
   title?: string;
 }>;
 
-export default function ModalScreen({ isVisible, children, onClose, title = "Modal" }: Props) {
+export default function ModalCustomizado({ isVisible, children, onClose, title = "Modal" }: Props) {
   const translateY = useRef(new Animated.Value(300)).current;
 
   useEffect(() => {
