@@ -83,7 +83,7 @@ export function DetalhesColecaoScreen() {
 
   const escolherImagem = async () => {
     const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       base64: true,
       quality: 0.7,
@@ -254,7 +254,7 @@ export function DetalhesColecaoScreen() {
         </Pressable>
       </Modal>
 
-      {/* Modal de Adicionar Bookmark */}
+    
       <Modal
         visible={addBookmarkModalVisible}
         animationType="slide"

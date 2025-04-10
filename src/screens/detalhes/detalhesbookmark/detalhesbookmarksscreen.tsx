@@ -96,6 +96,7 @@ export function DetalhesBookmarkScreen() {
   const salvarEdicao = async () => {
     try {
       await axios.put(`https://moonbookmarks-back.onrender.com/bookmarks/${id}`, {
+        ...bookmark,
         status: novoStatus,
         progresso: Number(novoProgresso),
         comentario: novoComentario,
@@ -203,7 +204,6 @@ export function DetalhesBookmarkScreen() {
         </ScrollView>
       </ModalScreen>
 
-      {/* Modal de Edição */}
       <ModalScreen isVisible={editModalVisible} onClose={() => setEditModalVisible(false)} title="Editar Bookmark">
         <ScrollView contentContainerStyle={{ gap: 12 }}>
           <Text>Status</Text>
