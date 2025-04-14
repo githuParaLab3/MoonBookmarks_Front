@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TextInput, TouchableOpacity, StyleSheet, Text } from "react-native";
+import { View, TextInput, TouchableOpacity, Text, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import axios from "axios";
@@ -22,17 +22,18 @@ export function LoginScreen() {
       // Verifique a resposta recebida
       console.log("Resposta do login:", response.data); // Aqui você vai ver a estrutura da resposta
 
-      // Já que a resposta é o token diretamente, não precisamos acessar `token`
-      const token = response.data;  // Agora, `response.data` contém diretamente o token
+      const { token, userId } = response.data;  // Supondo que o backend retorne `token` e `userId`
 
-      if (token) {
-        // Armazene o token no AsyncStorage
+      if (token && userId) {
+        // Armazene o token e o userId no AsyncStorage
         await AsyncStorage.setItem("authToken", token);
-        
+        await AsyncStorage.setItem("userId", userId);  // Armazene o id do usuário
+
         // Redirecione para a tela principal após login bem-sucedido
         router.navigate('/(tabs)/(home)');
       } else {
-        console.error("Token não encontrado na resposta do servidor.");
+        console.error("Token ou ID do usuário não encontrados na resposta do servidor.");
+        Alert.alert("Erro", "Falha no login, tente novamente.");
       }
     } catch (error: any) {
       // Afirmando que o erro é do tipo 'any' para poder acessar 'response' de forma segura
@@ -42,6 +43,7 @@ export function LoginScreen() {
         console.error("Erro inesperado:", error);
       }
       // Exibir um erro para o usuário se houver falha no login
+      Alert.alert("Erro", "Não foi possível fazer login.");
     }
   };
 

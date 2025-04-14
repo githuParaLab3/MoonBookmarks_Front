@@ -18,30 +18,11 @@ import ModalCustomizado from "@/src/components/ModalCustomizado";
 import * as ImagePicker from "expo-image-picker";
 import { Picker } from "@react-native-picker/picker";
 import styles from "./detahesobras.styles";
+import { Tipo } from "@/src/types";
+import { Obra as ObraDetalhes } from "@/src/types";
+import { useObra } from "@/src/hooks/useObras";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Enum de tipos
-enum Tipo {
-  MANGA = "MANGA",
-  MANHWA = "MANHWA",
-  MANHUA = "MANHUA",
-  HQ = "HQ",
-  LIVRO = "LIVRO",
-  NOVEL = "NOVEL",
-  ANIME = "ANIME",
-  DESENHO = "DESENHO",
-  SERIE = "SERIE",
-  FILME = "FILME"
-}
-
-interface ObraDetalhes {
-  id: string;
-  titulo: string;
-  descricao: string;
-  imagem: string;
-  autor: string;
-  tipo: Tipo;
-  generos: string[];
-}
 
 const formatarTipo = (tipo: Tipo | null | undefined) => {
   if (!tipo) return "Tipo desconhecido";
@@ -52,6 +33,8 @@ export function DetalhesObraScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { id } = params as { id: string };
+  const { data: obraData, isLoading, refetch } = useObra(id); // ✅ fora do useEffect
+
 
   const [obra, setObra] = useState<ObraDetalhes | null>(null);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -61,25 +44,22 @@ export function DetalhesObraScreen() {
   const [status, setStatus] = useState("");
   const [comentario, setComentario] = useState(""); // Adicionado para comentário
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
+  
 
   useEffect(() => {
-    if (id) {
-      axios
-        .get(`https://moonbookmarks-back.onrender.com/obras/${id}`)
-        .then((response) => {
-          setObra(response.data);
-        })
-        .catch(() => {
-          Alert.alert("Erro", "Não foi possível carregar os dados da obra.");
-        });
+    if (!isLoading && obraData) {
+      // Apenas atualize a obra quando os dados estiverem prontos
+      setObra(obraData);
     }
-  }, [id]);
+  }, [isLoading, obraData]);
+
 
   const handleSubmitBookmark = async () => {
     try {
+      const userId = await AsyncStorage.getItem('userId');
       await axios.post("https://moonbookmarks-back.onrender.com/bookmarks", {
         obra: { id },
-        usuario: { id: "8fb0fe59-698b-45e3-8fb3-043e984b4e0d" },
+        usuario: { id: userId },
         progresso: Number(progresso),
         status,
         comentario, // Enviando o comentário
@@ -134,7 +114,7 @@ export function DetalhesObraScreen() {
 
   const handleSelecionarImagem = async () => {
     const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       base64: true,
       quality: 0.7,
     });
@@ -262,7 +242,6 @@ export function DetalhesObraScreen() {
             <Text style={styles.buttonText}>Selecionar imagem</Text>
           </TouchableOpacity>
 
-          {/* Preview da Imagem */}
           {imagemPreview && (
             <View style={styles.imagePreviewContainer}>
               <Text style={styles.label}>Preview da Imagem</Text>

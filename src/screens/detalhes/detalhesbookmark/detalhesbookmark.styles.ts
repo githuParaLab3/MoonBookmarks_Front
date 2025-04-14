@@ -85,16 +85,62 @@ const styles = StyleSheet.create({
       fontWeight: "bold",
     },
     colecaoItem: {
-      padding: 12,
-      borderBottomWidth: 1,
-      borderColor: "#eee",
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: "#ccc",
+      marginBottom: 10,
+      backgroundColor: "#f9f9f9",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
     },
+    
     colecaoAtiva: {
-      backgroundColor: "#dfefff",
+      backgroundColor: "#d1e7dd", // Verde claro tipo "selecionado"
+      borderColor: "#0f5132",
     },
+    
     colecaoTexto: {
       fontSize: 16,
+      color: "#333",
+      fontWeight: "500",
     },
+    colecaoItemContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: 10,
+      borderBottomWidth: 1,
+      borderColor: "#ccc",
+      borderRadius: 8,
+      marginBottom: 8,
+      backgroundColor: "#f9f9f9",
+    },
+    
+    colecaoImagem: {
+      width: 60,
+      height: 60,
+      borderRadius: 8,
+      marginRight: 10,
+    },
+    
+    colecaoTextoContainer: {
+      flex: 1,
+    },
+    
+    colecaoTitulo: {
+      fontWeight: "bold",
+      fontSize: 16,
+      marginBottom: 4,
+    },
+    
+    colecaoDescricao: {
+      fontSize: 14,
+      color: "#666",
+    },
+
+
   });
   
   

@@ -14,6 +14,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import axios from "axios";
 import ModalCustomizado from "@/src/components/ModalCustomizado";
 import { Picker } from "@react-native-picker/picker";
+import { useRemoveColecaoFromBookmark, useColecoesByBookmark } from "@/src/hooks/useBookmarks"
 import styles from "./detalhesbookmark.styles";
 
 interface BookmarkDetalhes {
@@ -58,6 +59,9 @@ export function DetalhesBookmarkScreen() {
   const [novoStatus, setNovoStatus] = useState("");
   const [novoProgresso, setNovoProgresso] = useState("");
   const [novoComentario, setNovoComentario] = useState("");
+
+  const { data: colecoesBookmark } = useColecoesByBookmark(id);
+  const { mutate: removeColecaoFromBookmark } = useRemoveColecaoFromBookmark();
 
   useEffect(() => {
     if (id) {
@@ -141,6 +145,19 @@ export function DetalhesBookmarkScreen() {
     }
   };
 
+  const removerColecao = (colecaoId: string) => {
+    Alert.alert("Remover Coleção", "Tem certeza que deseja desvincular essa coleção?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Remover",
+        onPress: () => {
+          removeColecaoFromBookmark({ bookmarkId: id, colecaoId });
+          setColecoesDoBookmark(colecoesDoBookmark.filter(cid => cid !== colecaoId));
+        },
+      },
+    ]);
+  };
+
   const abrirModal = () => {
     setModalVisible(true);
     carregarColecoes();
@@ -186,24 +203,43 @@ export function DetalhesBookmarkScreen() {
 
       {/* Modal de Coleções */}
       <ModalCustomizado isVisible={modalVisible} onClose={() => setModalVisible(false)} title="Coleções">
-        <ScrollView>
-          {colecoes.map((colecao) => {
-            const estaNaColecao = colecoesDoBookmark.includes(colecao.id);
-            return (
-              <TouchableOpacity
-                key={colecao.id}
-                onPress={() => toggleColecao(colecao.id)}
-                style={[styles.colecaoItem, estaNaColecao && styles.colecaoAtiva]}
-              >
-                <Text style={styles.colecaoTexto}>
-                  {estaNaColecao ? "✓ " : ""}{colecao.nome}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+        {colecoesBookmark && colecoesBookmark.length > 0 ? (
+          <ScrollView>
+            {colecoesBookmark.map((colecao) => {
+              const estaNaColecao = colecoesDoBookmark.includes(colecao.id);
+              return (
+                <TouchableOpacity
+                  key={colecao.id}
+                  onPress={() => {
+                    router.push(`/detalhescolecao/${colecao.id}`);
+                    setModalVisible(false);
+                  }}
+                  onLongPress={() => {
+                    if (estaNaColecao) removerColecao(colecao.id);
+                  }}
+                  style={[styles.colecaoItemContainer, estaNaColecao && styles.colecaoAtiva]}
+                >
+                  <Image
+                    source={{ uri: `data:image/jpeg;base64,${colecao.foto}` }}
+                    style={styles.colecaoImagem}
+                  />
+                  <View style={styles.colecaoTextoContainer}>
+                    <Text style={styles.colecaoTitulo}>
+                      {estaNaColecao ? "✓ " : ""}{colecao.titulo}
+                    </Text>
+                    <Text style={styles.colecaoDescricao}>{colecao.descricao}</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        ) : (
+          <Text style={{ textAlign: "center", marginTop: 20 }}>Este bookmark ainda não está em nenhuma coleção.</Text>
+        )}
+
       </ModalCustomizado>
 
+      {/* Modal de Edição */}
       <ModalCustomizado isVisible={editModalVisible} onClose={() => setEditModalVisible(false)} title="Editar Bookmark">
         <ScrollView contentContainerStyle={{ gap: 12 }}>
           <Text>Status</Text>

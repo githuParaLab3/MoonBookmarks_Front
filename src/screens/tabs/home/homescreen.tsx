@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { useColecoes, useCreateColecao } from "@/src/hooks/useColecoes"; // Usan
 import styles from "./homescreen.styles";
 import Header from "@/src/components/Header";
 import ModalCustomizado from "@/src/components/ModalCustomizado";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function HomeScreen() {
   const [searchText, setSearchText] = useState("");
@@ -26,21 +27,35 @@ export function HomeScreen() {
     descricao: "",
     foto: "",
   });
+  const [userId, setUserId] = useState<string | null>(null); // Definindo o estado para armazenar o userId
   const router = useRouter();
 
   // Usando o hook para pegar as coleções
   const { mutate: createColecao, status: createStatus } = useCreateColecao(); // Aqui estamos pegando a propriedade 'status' da mutação
   const { data: colecoes, isLoading, error, refetch } = useColecoes(); // Adicionando o refetch
 
+  // Carregar o userId de forma assíncrona
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const storedUserId = await AsyncStorage.getItem('userId');
+      setUserId(storedUserId);
+    };
+    fetchUserId();
+  }, []); // O array vazio garante que isso aconteça apenas uma vez, após a montagem do componente
+
   const handleCreateCollection = () => {
     if (!novaColecao.titulo) {
       alert("O título da coleção é obrigatório");
       return;
     }
+    if (!userId) {
+      alert("Usuário não está logado.");
+      return;
+    }
     createColecao(
       {
         ...novaColecao,
-        usuario: { id: "8fb0fe59-698b-45e3-8fb3-043e984b4e0d" }, // Aqui você pode ajustar o id do usuário conforme necessário
+        usuario: { id: userId }, // Agora o userId está sendo passado corretamente
       },
       {
         onSuccess: () => {
@@ -67,7 +82,7 @@ export function HomeScreen() {
       const base64 = result.assets[0].base64;
       setNovaColecao({
         ...novaColecao,
-        foto: `data:image/jpeg;base64,${base64}`,
+        foto: base64 || "",
       });
     }
   };
@@ -123,7 +138,7 @@ export function HomeScreen() {
                   {item.foto ? (
                     <Image
                       source={{
-                        uri: `data:image/jpeg;base64,${item.foto}`, // Adicionando o prefixo para base64
+                        uri: `data:image/jpeg;base64,${item.foto}`,
                       }}
                       style={styles.collectionImage}
                     />
@@ -185,7 +200,7 @@ export function HomeScreen() {
 
         {novaColecao.foto && (
           <Image
-            source={{ uri: novaColecao.foto }}
+            source={{ uri: `data:image/jpeg;base64,${novaColecao.foto}` }}
             style={styles.imagePreview}
           />
         )}

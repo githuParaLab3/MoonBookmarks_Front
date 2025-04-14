@@ -9,6 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Button
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -18,6 +19,8 @@ import {
   useColecaoById,
   useUpdateColecao,
   useDeleteColecao,
+  useAddBookmarkToColecao,
+  useRemoveBookmarkFromColecao, // Assumindo que você tenha um hook para remover o bookmark
 } from "@/src/hooks/useColecoes";
 import { useBookmarks } from "@/src/hooks/useBookmarks";
 import { Colecao, Bookmark } from "@/src/types";
@@ -37,6 +40,8 @@ export function DetalhesColecaoScreen() {
   const { data: allBookmarks } = useBookmarks();
   const { mutate: updateColecao } = useUpdateColecao();
   const { mutate: deleteColecao } = useDeleteColecao();
+  const { mutate: addBookmarkToColecao } = useAddBookmarkToColecao();
+  const { mutate: removeBookmarkFromColecao } = useRemoveBookmarkFromColecao(); // Hook para remover o bookmark
 
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [addBookmarkModalVisible, setAddBookmarkModalVisible] = useState(false);
@@ -72,21 +77,18 @@ export function DetalhesColecaoScreen() {
       const colecaoAtualizada = {
         titulo,
         descricao,
-        foto: novaImagem || colecao.foto, // Garantindo que a foto seja atualizada se a nova imagem estiver definida
+        foto: novaImagem || colecao.foto, // Atualiza a foto se uma nova imagem for escolhida
       };
-  
-      // Chamando a mutação para atualizar a coleção
+
       updateColecao({ id: colecao.id, colecaoAtualizada }, {
         onSuccess: () => {
-          // Refazer a consulta da coleção para garantir que os dados sejam atualizados
           refetchColecao();
         },
       });
-  
+
       setEditModalVisible(false);
     }
   };
-  
 
   const handleExcluirColecao = () => {
     Alert.alert("Excluir", "Tem certeza que deseja excluir a coleção?", [
@@ -101,6 +103,34 @@ export function DetalhesColecaoScreen() {
         },
       },
     ]);
+  };
+
+  const handleAdicionarBookmark = (bookmarkId: string) => {
+    if (colecao) {
+      addBookmarkToColecao(
+        { colecaoId: colecao.id, bookmarkId },
+        {
+          onSuccess: () => {
+            refetchColecao(); // Atualiza os dados da coleção
+          },
+        }
+      );
+    } else {
+      console.error("Coleção não encontrada!");
+    }
+  };
+
+  const handleRemoverBookmark = (bookmarkId: string) => {
+    if (colecao) {
+      removeBookmarkFromColecao(
+        { colecaoId: colecao.id, bookmarkId },
+        {
+          onSuccess: () => {
+            refetchColecao(); // Recarrega a coleção após a remoção
+          },
+        }
+      );
+    }
   };
 
   const bookmarksForaDaColecao =
@@ -168,7 +198,22 @@ export function DetalhesColecaoScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 40 }}
           renderItem={({ item }) => (
-            <View style={styles.item}>
+            <TouchableOpacity
+              onLongPress={() => {
+                Alert.alert(
+                  "Remover Bookmark",
+                  "Tem certeza que deseja remover este bookmark da coleção?",
+                  [
+                    { text: "Cancelar", style: "cancel" },
+                    {
+                      text: "Remover",
+                      onPress: () => handleRemoverBookmark(item.id),
+                    },
+                  ]
+                );
+              }}
+              style={styles.item}
+            >
               <Image
                 source={{ uri: `data:image/jpeg;base64,${item.obra.imagem}` }}
                 style={styles.itemImage}
@@ -179,7 +224,7 @@ export function DetalhesColecaoScreen() {
                   Progresso: {item.progresso}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
@@ -255,8 +300,11 @@ export function DetalhesColecaoScreen() {
                 <Text style={styles.itemProgresso}>
                   Progresso: {item.progresso}
                 </Text>
+                <Button
+                  title="Adicionar"
+                  onPress={() => handleAdicionarBookmark(item.id)}
+                />
               </View>
-              {/* Você pode adicionar aqui o botão para efetivamente adicionar o bookmark na coleção */}
             </View>
           )}
         />

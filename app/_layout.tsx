@@ -15,6 +15,8 @@ export default function RootLayout() {
         <Stack.Screen name="detalhescolecao" options={{ headerShown: false}}/>
         <Stack.Screen name="detalhesobra" options={{ headerShown: false}}/>
         <Stack.Screen name="detalhesbookmark" options={{ headerShown: false}}/>
+         <Stack.Screen name="telainicial" options={{ headerShown: false}}/>
+        
       </Stack>
     </QueryClientProvider>
 

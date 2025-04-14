@@ -1,7 +1,7 @@
-// src/hooks/useColecoes.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Colecao } from '../types/colecao';  // Ajuste conforme o local do tipo Colecao
+import { Bookmark } from '../types/bookmark';  // Ajuste' conforme o local do tipo Bookmark
 
 // Função para obter todas as coleções
 const fetchColecoes = async (): Promise<Colecao[]> => {
@@ -30,6 +30,28 @@ const updateColecao = async (id: string, colecaoAtualizada: Partial<Colecao>): P
 // Função para excluir uma colecao
 const deleteColecao = async (id: string): Promise<void> => {  // O id é string conforme sua model
   await axios.delete(`https://moonbookmarks-back.onrender.com/colecoes/${id}`);
+};
+
+// Função para adicionar um bookmark a uma coleção
+const addBookmarkToColecao = async (colecaoId: string, bookmarkId: string): Promise<Colecao> => {
+  const response = await axios.post(
+    `https://moonbookmarks-back.onrender.com/colecoes/${colecaoId}/bookmarks/${bookmarkId}`
+  );
+  return response.data;
+};
+
+// Função para remover um bookmark de uma coleção
+const removeBookmarkFromColecao = async (colecaoId: string, bookmarkId: string): Promise<Colecao> => {
+  const response = await axios.delete(
+    `https://moonbookmarks-back.onrender.com/colecoes/${colecaoId}/bookmarks/${bookmarkId}`
+  );
+  return response.data;
+};
+
+// Função para obter os bookmarks de uma coleção
+const fetchBookmarksByColecao = async (colecaoId: string): Promise<Bookmark[]> => {
+  const response = await axios.get(`https://moonbookmarks-back.onrender.com/colecoes/${colecaoId}/bookmarks`);
+  return response.data;
 };
 
 // Hook para obter todas as coleções
@@ -82,5 +104,38 @@ export const useDeleteColecao = () => {
     onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['colecoes'] });
     },
+  });
+};
+
+// Hook para adicionar um bookmark a uma coleção
+export const useAddBookmarkToColecao = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<Colecao, Error, { colecaoId: string; bookmarkId: string }>({
+    mutationFn: ({ colecaoId, bookmarkId }) => addBookmarkToColecao(colecaoId, bookmarkId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['colecoes'] });
+    },
+  });
+};
+
+// Hook para remover um bookmark de uma coleção
+export const useRemoveBookmarkFromColecao = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<Colecao, Error, { colecaoId: string; bookmarkId: string }>({
+    mutationFn: ({ colecaoId, bookmarkId }) => removeBookmarkFromColecao(colecaoId, bookmarkId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['colecoes'] });
+    },
+  });
+};
+
+// Hook para listar os bookmarks de uma coleção
+export const useBookmarksByColecao = (colecaoId: string) => {
+  return useQuery<Bookmark[], Error>({
+    queryKey: ['bookmarks', colecaoId],
+    queryFn: () => fetchBookmarksByColecao(colecaoId),
+    enabled: !!colecaoId, // Só ativa a query quando o colecaoId for válido
   });
 };
