@@ -9,7 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Button
+  Button,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useNavigation } from "expo-router";
@@ -20,7 +20,7 @@ import {
   useUpdateColecao,
   useDeleteColecao,
   useAddBookmarkToColecao,
-  useRemoveBookmarkFromColecao, // Assumindo que você tenha um hook para remover o bookmark
+  useRemoveBookmarkFromColecao,
 } from "@/src/hooks/useColecoes";
 import { useBookmarks } from "@/src/hooks/useBookmarks";
 import { Colecao, Bookmark } from "@/src/types";
@@ -37,11 +37,12 @@ export function DetalhesColecaoScreen() {
     isLoading: isColecaoLoading,
     refetch: refetchColecao,
   } = useColecaoById(id);
+
   const { data: allBookmarks } = useBookmarks();
   const { mutate: updateColecao } = useUpdateColecao();
   const { mutate: deleteColecao } = useDeleteColecao();
   const { mutate: addBookmarkToColecao } = useAddBookmarkToColecao();
-  const { mutate: removeBookmarkFromColecao } = useRemoveBookmarkFromColecao(); // Hook para remover o bookmark
+  const { mutate: removeBookmarkFromColecao } = useRemoveBookmarkFromColecao();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [addBookmarkModalVisible, setAddBookmarkModalVisible] = useState(false);
@@ -52,42 +53,50 @@ export function DetalhesColecaoScreen() {
 
   const [search, setSearch] = useState("");
 
+  // Estado local para armazenar a lista de bookmarks da coleção
+  const [bookmarksColecao, setBookmarksColecao] = useState<Bookmark[]>([]);
+
   useEffect(() => {
     if (colecao) {
       setTitulo(colecao.titulo);
-      setDescricao(colecao.descricao || "");
+      setDescricao(colecao.descricao ?? "");
+      setBookmarksColecao(colecao.bookmarks || []);  // Atualiza a lista de bookmarks
     }
   }, [colecao]);
 
   const escolherImagem = async () => {
     const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       base64: true,
       quality: 0.7,
     });
 
     if (!resultado.canceled && resultado.assets.length > 0) {
-      setNovaImagem(resultado.assets[0].base64 || null);
+      setNovaImagem(resultado.assets[0].base64 ?? null);
     }
   };
 
   const handleEditar = () => {
-    if (colecao) {
-      const colecaoAtualizada = {
-        titulo,
-        descricao,
-        foto: novaImagem || colecao.foto, // Atualiza a foto se uma nova imagem for escolhida
-      };
-
-      updateColecao({ id: colecao.id, colecaoAtualizada }, {
-        onSuccess: () => {
-          refetchColecao();
-        },
-      });
-
-      setEditModalVisible(false);
-    }
+    if (!colecao) return;
+  
+    const colecaoAtualizada = {
+      id: colecao.id,
+      titulo: titulo.trim(),
+      descricao: descricao.trim() || undefined,
+      foto: novaImagem ?? colecao.foto,
+    };
+  
+    updateColecao(colecaoAtualizada, {
+      onSuccess: () => {
+        refetchColecao();
+        setEditModalVisible(false);
+      },
+      onError: (error) => {
+        console.error("Erro ao atualizar coleção:", error);
+        Alert.alert("Erro", "Falha ao atualizar a coleção.");
+      },
+    });
   };
 
   const handleExcluirColecao = () => {
@@ -106,31 +115,43 @@ export function DetalhesColecaoScreen() {
   };
 
   const handleAdicionarBookmark = (bookmarkId: string) => {
-    if (colecao) {
-      addBookmarkToColecao(
-        { colecaoId: colecao.id, bookmarkId },
-        {
-          onSuccess: () => {
-            refetchColecao(); // Atualiza os dados da coleção
-          },
-        }
-      );
-    } else {
-      console.error("Coleção não encontrada!");
-    }
+    if (!colecao || !allBookmarks) return;
+
+    addBookmarkToColecao(
+      { colecaoId: colecao.id, bookmarkId },
+      {
+        onSuccess: () => {
+          // Atualiza a lista de bookmarks manualmente após adicionar
+          const bookmarkAdicionado = allBookmarks.find(
+            (bm) => bm.id === bookmarkId
+          );
+          if (bookmarkAdicionado) {
+            setBookmarksColecao((prevBookmarks) => [
+              ...prevBookmarks,
+              bookmarkAdicionado,
+            ]);
+          }
+          refetchColecao(); // Garantir que a coleção seja recarregada com dados mais recentes
+        },
+      }
+    );
   };
 
   const handleRemoverBookmark = (bookmarkId: string) => {
-    if (colecao) {
-      removeBookmarkFromColecao(
-        { colecaoId: colecao.id, bookmarkId },
-        {
-          onSuccess: () => {
-            refetchColecao(); // Recarrega a coleção após a remoção
-          },
-        }
-      );
-    }
+    if (!colecao) return;
+
+    removeBookmarkFromColecao(
+      { colecaoId: colecao.id, bookmarkId },
+      {
+        onSuccess: () => {
+          // Atualiza a lista de bookmarks manualmente após remover
+          setBookmarksColecao((prevBookmarks) =>
+            prevBookmarks.filter((bm) => bm.id !== bookmarkId)
+          );
+          refetchColecao(); // Garantir que a coleção seja recarregada com dados mais recentes
+        },
+      }
+    );
   };
 
   const bookmarksForaDaColecao =
@@ -142,8 +163,7 @@ export function DetalhesColecaoScreen() {
     bm.obra.titulo.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (isColecaoLoading)
-    return <Text style={{ padding: 20 }}>Carregando...</Text>;
+  if (isColecaoLoading) return <Text style={{ padding: 20 }}>Carregando...</Text>;
 
   return (
     <View style={styles.container}>
@@ -188,13 +208,13 @@ export function DetalhesColecaoScreen() {
         </TouchableOpacity>
       </View>
 
-      {colecao?.bookmarks?.length === 0 ? (
+      {bookmarksColecao.length === 0 ? (
         <Text style={{ textAlign: "center", marginTop: 20, color: "#777" }}>
           Nenhuma bookmark nessa coleção ainda.
         </Text>
       ) : (
         <FlatList
-          data={colecao?.bookmarks ?? []}
+          data={bookmarksColecao}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 40 }}
           renderItem={({ item }) => (
@@ -202,7 +222,7 @@ export function DetalhesColecaoScreen() {
               onLongPress={() => {
                 Alert.alert(
                   "Remover Bookmark",
-                  "Tem certeza que deseja remover este bookmark da coleção?",
+                  "Deseja remover este bookmark da coleção?",
                   [
                     { text: "Cancelar", style: "cancel" },
                     {
