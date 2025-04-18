@@ -21,6 +21,7 @@ import {
   useDeleteColecao,
   useAddBookmarkToColecao,
   useRemoveBookmarkFromColecao,
+  useBookmarksByColecao,
 } from "@/src/hooks/useColecoes";
 import { useBookmarks } from "@/src/hooks/useBookmarks";
 import { Colecao, Bookmark } from "@/src/types";
@@ -38,6 +39,12 @@ export function DetalhesColecaoScreen() {
     refetch: refetchColecao,
   } = useColecaoById(id);
 
+  const {
+    data: bookmarksDaColecao,
+    isLoading: isBookmarksLoading,
+    refetch: refetchBookmarksColecao,
+  } = useBookmarksByColecao(id);
+
   const { data: allBookmarks } = useBookmarks();
   const { mutate: updateColecao } = useUpdateColecao();
   const { mutate: deleteColecao } = useDeleteColecao();
@@ -50,23 +57,18 @@ export function DetalhesColecaoScreen() {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [novaImagem, setNovaImagem] = useState<string | null>(null);
-
   const [search, setSearch] = useState("");
-
-  // Estado local para armazenar a lista de bookmarks da coleção
-  const [bookmarksColecao, setBookmarksColecao] = useState<Bookmark[]>([]);
 
   useEffect(() => {
     if (colecao) {
       setTitulo(colecao.titulo);
       setDescricao(colecao.descricao ?? "");
-      setBookmarksColecao(colecao.bookmarks || []);  // Atualiza a lista de bookmarks
     }
   }, [colecao]);
 
   const escolherImagem = async () => {
     const resultado = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"],
       allowsEditing: true,
       base64: true,
       quality: 0.7,
@@ -79,14 +81,14 @@ export function DetalhesColecaoScreen() {
 
   const handleEditar = () => {
     if (!colecao) return;
-  
+
     const colecaoAtualizada = {
       id: colecao.id,
       titulo: titulo.trim(),
       descricao: descricao.trim() || undefined,
       foto: novaImagem ?? colecao.foto,
     };
-  
+
     updateColecao(colecaoAtualizada, {
       onSuccess: () => {
         refetchColecao();
@@ -121,17 +123,8 @@ export function DetalhesColecaoScreen() {
       { colecaoId: colecao.id, bookmarkId },
       {
         onSuccess: () => {
-          // Atualiza a lista de bookmarks manualmente após adicionar
-          const bookmarkAdicionado = allBookmarks.find(
-            (bm) => bm.id === bookmarkId
-          );
-          if (bookmarkAdicionado) {
-            setBookmarksColecao((prevBookmarks) => [
-              ...prevBookmarks,
-              bookmarkAdicionado,
-            ]);
-          }
-          refetchColecao(); // Garantir que a coleção seja recarregada com dados mais recentes
+          refetchBookmarksColecao();
+          refetchColecao();
         },
       }
     );
@@ -144,11 +137,8 @@ export function DetalhesColecaoScreen() {
       { colecaoId: colecao.id, bookmarkId },
       {
         onSuccess: () => {
-          // Atualiza a lista de bookmarks manualmente após remover
-          setBookmarksColecao((prevBookmarks) =>
-            prevBookmarks.filter((bm) => bm.id !== bookmarkId)
-          );
-          refetchColecao(); // Garantir que a coleção seja recarregada com dados mais recentes
+          refetchBookmarksColecao();
+          refetchColecao();
         },
       }
     );
@@ -156,7 +146,7 @@ export function DetalhesColecaoScreen() {
 
   const bookmarksForaDaColecao =
     allBookmarks?.filter(
-      (bm) => !(colecao?.bookmarks ?? []).some((b) => b.id === bm.id)
+      (bm) => !bookmarksDaColecao?.some((b) => b.id === bm.id)
     ) || [];
 
   const bookmarksFiltrados = bookmarksForaDaColecao.filter((bm) =>
@@ -208,13 +198,15 @@ export function DetalhesColecaoScreen() {
         </TouchableOpacity>
       </View>
 
-      {bookmarksColecao.length === 0 ? (
+      {isBookmarksLoading ? (
+        <Text style={{ textAlign: "center", marginTop: 20 }}>Carregando bookmarks...</Text>
+      ) : bookmarksDaColecao?.length === 0 ? (
         <Text style={{ textAlign: "center", marginTop: 20, color: "#777" }}>
           Nenhuma bookmark nessa coleção ainda.
         </Text>
       ) : (
         <FlatList
-          data={bookmarksColecao}
+          data={bookmarksDaColecao}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 40 }}
           renderItem={({ item }) => (
@@ -222,7 +214,7 @@ export function DetalhesColecaoScreen() {
               onLongPress={() => {
                 Alert.alert(
                   "Remover Bookmark",
-                  "Deseja remover este bookmark da coleção?",
+                  "Deseja remover esta bookmark da coleção?",
                   [
                     { text: "Cancelar", style: "cancel" },
                     {

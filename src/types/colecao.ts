@@ -7,6 +7,7 @@ export interface Colecao {
     descricao?: string; 
     foto?: string; 
     usuario?: Usuario; 
-    bookmarks?: Bookmark[]; 
+    bookmarks?: Bookmark[];
+    bookmarkIds?: String[];
   }
   

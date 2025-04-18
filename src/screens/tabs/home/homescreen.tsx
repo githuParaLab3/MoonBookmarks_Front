@@ -37,7 +37,7 @@ export function HomeScreen() {
   // Carregar o userId de forma assíncrona
   useEffect(() => {
     const fetchUserId = async () => {
-      const storedUserId = await AsyncStorage.getItem('userId');
+      const storedUserId = await AsyncStorage.getItem("userId");
       setUserId(storedUserId);
     };
     fetchUserId();
@@ -150,7 +150,11 @@ export function HomeScreen() {
                   <View style={styles.collectionInfo}>
                     <Text style={styles.collectionTitle}>{item.titulo}</Text>
                     <Text style={styles.collectionItems}>
-                      {item.bookmarks?.length || 0} obras na lista
+                      {item.bookmarkIds?.length || 0}{" "}
+                      {item.bookmarkIds?.length === 1
+                        ? "bookmark"
+                        : "bookmarks"}{" "}
+                      na lista
                     </Text>
                   </View>
                 </View>
