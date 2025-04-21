@@ -6,14 +6,13 @@ import {
   FlatList,
   TextInput,
   ActivityIndicator,
-  Modal,
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import FloatingActionButton from "@/src/components/FloatingActionButton";
 import * as ImagePicker from "expo-image-picker";
-import { useColecoes, useCreateColecao } from "@/src/hooks/useColecoes"; // Usando os hooks personalizados
+import { useColecoes, useCreateColecao } from "@/src/hooks/useColecoes"; 
 import styles from "./homescreen.styles";
 import Header from "@/src/components/Header";
 import ModalCustomizado from "@/src/components/ModalCustomizado";
@@ -27,21 +26,20 @@ export function HomeScreen() {
     descricao: "",
     foto: "",
   });
-  const [userId, setUserId] = useState<string | null>(null); // Definindo o estado para armazenar o userId
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
-  // Usando o hook para pegar as coleções
-  const { mutate: createColecao, status: createStatus } = useCreateColecao(); // Aqui estamos pegando a propriedade 'status' da mutação
-  const { data: colecoes, isLoading, error, refetch } = useColecoes(); // Adicionando o refetch
+  const { mutate: createColecao, status: createStatus } = useCreateColecao(); 
+  const { data: colecoes, isLoading, error, refetch } = useColecoes(); 
 
-  // Carregar o userId de forma assíncrona
+  
   useEffect(() => {
     const fetchUserId = async () => {
       const storedUserId = await AsyncStorage.getItem("userId");
       setUserId(storedUserId);
     };
     fetchUserId();
-  }, []); // O array vazio garante que isso aconteça apenas uma vez, após a montagem do componente
+  }, []); 
 
   const handleCreateCollection = () => {
     if (!novaColecao.titulo) {
@@ -55,11 +53,11 @@ export function HomeScreen() {
     createColecao(
       {
         ...novaColecao,
-        usuario: { id: userId }, // Agora o userId está sendo passado corretamente
+        usuario: { id: userId }, 
       },
       {
         onSuccess: () => {
-          // Após a criação da coleção, refetche os dados para atualizar a lista
+        
           refetch();
         },
         onError: () => {
@@ -87,12 +85,12 @@ export function HomeScreen() {
     }
   };
 
-  // Filtro das coleções com base no texto de pesquisa
+
   const filteredCollections = colecoes?.filter((collection) =>
     collection.titulo?.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  // Exibição enquanto carrega as coleções
+ 
   if (isLoading) {
     return <ActivityIndicator size="large" color="#6200ee" />;
   }
@@ -128,9 +126,7 @@ export function HomeScreen() {
         renderItem={({ item }) => {
           return (
             <View style={styles.collectionItem}>
-              <Text style={styles.categoryTitle}>
-                {item.titulo || "Sem título"}
-              </Text>
+              
               <TouchableOpacity
                 onPress={() => router.push(`/detalhescolecao/${item.id}`)}
               >

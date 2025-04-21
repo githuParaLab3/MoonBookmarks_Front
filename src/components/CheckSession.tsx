@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { ActivityIndicator } from 'react-native-paper';
 
 const CheckSession = () => {
   const router = useRouter();
@@ -13,7 +14,7 @@ const CheckSession = () => {
       const userId = await AsyncStorage.getItem('userId');
 
       if (token && userId) {
-        // Se o token e o ID do usuário estiverem armazenados, redireciona para a tela principal
+        
         router.push('/(tabs)/(home)');
       } else {
         
@@ -27,7 +28,7 @@ const CheckSession = () => {
   }, []);
 
   if (isLoading) {
-    return <Text>Carregando...</Text>; // Você pode exibir um indicador de carregamento
+    return <ActivityIndicator/>
   }
 
   return null;

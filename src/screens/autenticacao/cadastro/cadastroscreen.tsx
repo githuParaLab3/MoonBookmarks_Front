@@ -13,16 +13,16 @@ export function CadastroScreen() {
 
   const handleRegister = async () => {
     try {
-      // Envia a requisição de registro para o backend
+      
       const response = await axios.post("https://moonbookmarks-back.onrender.com/auth/register", {
         email: email,
         nome: nickname,
-        senha: password, // Certifique-se de enviar a senha corretamente como "senha"
+        senha: password, 
       });
 
-      // Verifica se a resposta é bem-sucedida
+
       if (response.data === "Usuário registrado com sucesso!") {
-        // Redireciona para a tela de login após o cadastro bem-sucedido
+
         router.navigate('/(autenticacao)/(login)');
       } else {
         console.error("Erro ao registrar usuário:", response.data);
@@ -33,7 +33,7 @@ export function CadastroScreen() {
   };
 
   const handleLoginRedirect = () => {
-    router.navigate('/(autenticacao)/(login)'); // Redireciona para a tela de login
+    router.navigate('/(autenticacao)/(login)'); 
   };
 
   return (

@@ -33,7 +33,7 @@ export function DetalhesObraScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { id } = params as { id: string };
-  const { data: obraData, isLoading, refetch } = useObra(id); // ✅ fora do useEffect
+  const { data: obraData, isLoading, refetch } = useObra(id); 
 
 
   const [obra, setObra] = useState<ObraDetalhes | null>(null);
@@ -42,13 +42,13 @@ export function DetalhesObraScreen() {
   const [isCriarBookmarkVisible, setCriarBookmarkVisible] = useState(false);
   const [progresso, setProgresso] = useState("");
   const [status, setStatus] = useState("");
-  const [comentario, setComentario] = useState(""); // Adicionado para comentário
+  const [comentario, setComentario] = useState(""); 
   const [imagemPreview, setImagemPreview] = useState<string | null>(null);
   
 
   useEffect(() => {
     if (!isLoading && obraData) {
-      // Apenas atualize a obra quando os dados estiverem prontos
+     
       setObra(obraData);
     }
   }, [isLoading, obraData]);
@@ -62,13 +62,13 @@ export function DetalhesObraScreen() {
         usuario: { id: userId },
         progresso: Number(progresso),
         status,
-        comentario, // Enviando o comentário
+        comentario, 
       });
       Alert.alert("Sucesso", "Bookmark criada com sucesso!");
       setCriarBookmarkVisible(false);
       setProgresso("");
       setStatus("");
-      setComentario(""); // Limpar o campo de comentário após salvar
+      setComentario(""); 
     } catch (error) {
       Alert.alert("Erro", "Não foi possível criar a bookmark.");
     }
@@ -194,7 +194,7 @@ export function DetalhesObraScreen() {
             placeholder="Deixe um comentário..."
             value={comentario}
             onChangeText={setComentario}
-            style={[styles.input, { height: 80 }]} // Aumentando a altura para comentário
+            style={[styles.input, { height: 80 }]} 
             multiline
           />
 

@@ -16,6 +16,8 @@ import ModalCustomizado from "@/src/components/ModalCustomizado";
 import { Picker } from "@react-native-picker/picker";
 import { useRemoveColecaoFromBookmark, useColecoesByBookmark } from "@/src/hooks/useBookmarks"
 import styles from "./detalhesbookmark.styles";
+import { ActivityIndicator } from "react-native-paper";
+import { Colecao } from "@/src/types";
 
 interface BookmarkDetalhes {
   id: string;
@@ -30,11 +32,6 @@ interface BookmarkDetalhes {
   status: string;
   progresso: number;
   comentario: string;
-}
-
-interface Colecao {
-  id: string;
-  nome: string;
 }
 
 const statusLabels: { [key: string]: string } = {
@@ -163,11 +160,12 @@ export function DetalhesBookmarkScreen() {
     carregarColecoes();
   };
 
-  if (!bookmark) return <Text>Carregando...</Text>;
+  if (!bookmark) return <ActivityIndicator color="#9748FF" style={{position: "absolute", top: "50%", 
+  left: "50%", transform: [{ translateX: -12 }, { translateY: -12 }],}}/>;
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+      
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <MaterialIcons name="arrow-back" size={24} color="black" />
@@ -175,7 +173,7 @@ export function DetalhesBookmarkScreen() {
         <Text style={styles.headerTitle}>Detalhes do Bookmark</Text>
       </View>
 
-      {/* Conteúdo */}
+     
       <Image source={{ uri: `data:image/jpeg;base64,${bookmark.obra.imagem}` }} style={styles.bookmarkImage} />
       <Text style={styles.titulo}>{bookmark.obra.titulo}</Text>
       <Text style={styles.capitulo}>{bookmark.obra.descricao}</Text>
@@ -183,7 +181,7 @@ export function DetalhesBookmarkScreen() {
       <Text style={styles.progresso}>Progresso: {bookmark.progresso}</Text>
       <Text style={styles.descricao}>{bookmark.comentario}</Text>
 
-      {/* Ações */}
+      
       <View style={styles.actions}>
         <TouchableOpacity style={styles.editButton} onPress={handleEditarBookmark}>
           <MaterialIcons name="edit" size={20} color="white" />
@@ -201,7 +199,7 @@ export function DetalhesBookmarkScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Modal de Coleções */}
+   
       <ModalCustomizado isVisible={modalVisible} onClose={() => setModalVisible(false)} title="Coleções">
         {colecoesBookmark && colecoesBookmark.length > 0 ? (
           <ScrollView>
@@ -239,7 +237,7 @@ export function DetalhesBookmarkScreen() {
 
       </ModalCustomizado>
 
-      {/* Modal de Edição */}
+      
       <ModalCustomizado isVisible={editModalVisible} onClose={() => setEditModalVisible(false)} title="Editar Bookmark">
         <ScrollView contentContainerStyle={{ gap: 12 }}>
           <Text>Status</Text>

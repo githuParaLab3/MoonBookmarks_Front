@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#f5f5f5", // tom neutro claro
+    backgroundColor: "#f5f5f5",
   },
   searchContainer: {
     marginTop: 15,
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     marginRight: 12,
-    color: "#7c3aed", // roxo vibrante do Material
+    color: "#7c3aed", 
   },
   searchInput: {
     flex: 1,

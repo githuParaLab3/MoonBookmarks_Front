@@ -18,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Usuario } from "@/src/types/usuario";
 import styles from "./configuracoesscreen.styles";
 
+
 export function ConfiguracoesScreen() {
   const navigation = useNavigation();
   const router = useRouter();
@@ -114,7 +115,7 @@ export function ConfiguracoesScreen() {
         <Text style={styles.logoutText}>Sair</Text>
       </TouchableOpacity>
 
-      {/* MODAL DE EDIÇÃO */}
+
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -166,6 +167,8 @@ export function ConfiguracoesScreen() {
           </View>
         </View>
       </Modal>
+      
+
     </View>
   );
 }

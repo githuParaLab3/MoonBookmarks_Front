@@ -1,0 +1,1 @@
+export { CadastroScreen as default } from './cadastroscreen';

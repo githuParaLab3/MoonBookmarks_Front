@@ -36,7 +36,7 @@ export default function ModalCustomizado({ isVisible, children, onClose, title =
   }, [isVisible]);
 
   return (
-    <Modal transparent visible={isVisible} animationType="none">
+    <Modal transparent visible={isVisible} animationType="slide">
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.backDrop}>
           <Animated.View style={[styles.modalContainer, { transform: [{ translateY }] }]}>

@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface UserStore {
   token: string | null;
-  userId: string | null;  // Adiciona o ID do usuário à store
+  userId: string | null;  
   setToken: (token: string | null) => Promise<void>;
   setUserId: (userId: string | null) => void;
   clearToken: () => Promise<void>;
@@ -12,7 +12,7 @@ interface UserStore {
 
 export const useUserStore = create<UserStore>((set) => ({
   token: null,
-  userId: null,  // Inicializa o ID do usuário como null
+  userId: null, 
   setToken: async (token: string | null) => {
     if (token) {
       await AsyncStorage.setItem('authToken', token);
@@ -27,7 +27,7 @@ export const useUserStore = create<UserStore>((set) => ({
   },
   clearToken: async () => {
     await AsyncStorage.removeItem('authToken');
-    set({ token: null, userId: null });  // Limpa o token e o ID do usuário
+    set({ token: null, userId: null });  
   },
   checkToken: async () => {
     const token = await AsyncStorage.getItem('authToken');

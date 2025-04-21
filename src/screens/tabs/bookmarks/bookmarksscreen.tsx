@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { FlatList, TextInput, StyleSheet, Text, View, Image, Pressable, ActivityIndicator, Modal, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { FlatList, TextInput, Text, View, Image, Pressable, ActivityIndicator, Modal, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useBookmarks } from "../../../hooks/useBookmarks"; // Importando o hook para pegar os bookmarks
+import { useBookmarks } from "../../../hooks/useBookmarks"; 
 import { Tipo, Status } from "../../../types/enums";
 import styles from "./bookmarks.styles";
 import Header from "@/src/components/Header";
@@ -17,7 +17,7 @@ export function BookmarksScreen() {
   const router = useRouter();
   const tipos = Object.values(Tipo);
   const status = Object.values(Status);
-  const { data: bookmarks, isLoading, isError, refetch } = useBookmarks();
+  const { data: bookmarks, isLoading, isError } = useBookmarks();
 
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export function BookmarksScreen() {
   
     const imageSource = normalizedImage
       ? { uri: normalizedImage }
-      : require("@/assets/images/logo.png"); // substitua com o caminho certo da sua imagem local
+      : require("@/assets/images/logo.png"); 
   
     return (
       <Pressable
@@ -87,7 +87,7 @@ export function BookmarksScreen() {
   };
   
   
-  // Verificando se a requisição falhou
+
   if (isLoading) {
     return <ActivityIndicator size="large" color="#6200ee" />;
   }

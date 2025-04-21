@@ -1,10 +1,10 @@
-// FloatingActionButton.tsx
+
 import { Pressable, StyleSheet, ViewStyle } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 type Props = {
   onPress: () => void;
-  style?: ViewStyle; // <- estilo externo opcional
+  style?: ViewStyle; 
 };
 
 export default function FloatingActionButton({ onPress, style }: Props) {

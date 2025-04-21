@@ -13,42 +13,41 @@ export function LoginScreen() {
 
   const handleLogin = async () => {
     try {
-      // Envia a requisição de login para o backend
+      
       const response = await axios.post("https://moonbookmarks-back.onrender.com/auth/login", {
-        email: email,
-        senha: password, // Certifique-se de enviar o campo correto "senha" ao invés de "password"
+        email,
+        senha: password, 
       });
 
-      // Verifique a resposta recebida
-      console.log("Resposta do login:", response.data); // Aqui você vai ver a estrutura da resposta
+     
+      console.log("Resposta do login:", response.data); 
 
-      const { token, userId } = response.data;  // Supondo que o backend retorne `token` e `userId`
+      const { token, userId } = response.data;  
 
       if (token && userId) {
-        // Armazene o token e o userId no AsyncStorage
+      
         await AsyncStorage.setItem("authToken", token);
-        await AsyncStorage.setItem("userId", userId);  // Armazene o id do usuário
+        await AsyncStorage.setItem("userId", userId);  
 
-        // Redirecione para a tela principal após login bem-sucedido
         router.navigate('/(tabs)/(home)');
       } else {
         console.error("Token ou ID do usuário não encontrados na resposta do servidor.");
         Alert.alert("Erro", "Falha no login, tente novamente.");
       }
     } catch (error: any) {
-      // Afirmando que o erro é do tipo 'any' para poder acessar 'response' de forma segura
+    
       if (axios.isAxiosError(error)) {
         console.error("Erro no login:", error.response ? error.response.data : error.message);
       } else {
         console.error("Erro inesperado:", error);
       }
-      // Exibir um erro para o usuário se houver falha no login
+      
       Alert.alert("Erro", "Não foi possível fazer login.");
     }
   };
 
   const handleRegisterRedirect = () => {
-    router.navigate('/(autenticacao)/(cadastro)'); // Ajuste a rota conforme necessário
+    router.navigate('/(autenticacao)/(cadastro)'); 
   };
 
   return (

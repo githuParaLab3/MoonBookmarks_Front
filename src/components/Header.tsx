@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Para acessar AsyncStorage
-import axios from "axios"; // Para fazer requisição HTTP (caso precise pegar o nome do backend)
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
+import axios from "axios"; 
 
 export default function Header() {
-  const [userName, setUserName] = useState(""); // Estado para armazenar o nome do usuário
-  const [userPhoto, setUserPhoto] = useState(""); // Estado para armazenar a foto do usuário
+  const [userName, setUserName] = useState(""); 
+  const [userPhoto, setUserPhoto] = useState(""); 
   const router = useRouter();
 
   useEffect(() => {
@@ -16,11 +16,11 @@ export default function Header() {
         const userId = await AsyncStorage.getItem("userId");
 
         if (userId) {
-          // Faz a requisição para o backend para pegar o nome do usuário com base no userId
+          
           const response = await axios.get(
             `https://moonbookmarks-back.onrender.com/usuarios/${userId}`,
-          ); // Ajuste o endpoint conforme necessário
-          setUserName(response.data.nome); // Supondo que o nome do usuário seja retornado com a chave `nome`
+          ); 
+          setUserName(response.data.nome); 
           setUserPhoto(response.data.fotoPerfil || '');
         }
       } catch (error) {
@@ -35,8 +35,8 @@ export default function Header() {
     router.navigate("/configuracoes");
   };
 
-  // Usando o require para uma imagem local
-  const defaultProfileImage = require("../../assets/images/logo.png"); // Caminho para sua imagem local
+ 
+  const defaultProfileImage = require("../../assets/images/logo.png"); 
 
   return (
     <View style={styles.headerContainer}>
@@ -45,12 +45,12 @@ export default function Header() {
 
         <TouchableOpacity onPress={handleNavigateToSettings}>
           {userPhoto ? (
-            // Se o usuário tem uma foto de perfil, exibe a foto dele
+        
             <Image source={{ uri: `data:image/jpeg;base64,${userPhoto}` }} style={styles.profileImage} />
           ) : (
-            // Se não tem foto, exibe uma imagem padrão
+            
             <Image
-              source={defaultProfileImage} // Usando a imagem local aqui
+              source={defaultProfileImage} 
               style={styles.profileImage}
             />
           )}
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: "#9748FF",
-    height: 60, // Altura fixa para o header
+    height: 60,
     justifyContent: "center",
     borderRadius: 9,
   },

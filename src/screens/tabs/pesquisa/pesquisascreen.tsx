@@ -26,19 +26,19 @@ import { useObras, useCreateObra } from "@/src/hooks/useObras";
 import ModalCustomizado from "@/src/components/ModalCustomizado";
 
 export function PesquisaScreen() {
-  // Hook para obter obras usando React Query
+  
   const { data: obras, isLoading } = useObras();
-  // Hook para criar uma obra
+
   const createObraMutation = useCreateObra();
 
-  // Estados locais para filtros e modal
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTipo, setSelectedTipo] = useState("");
   const [generoFilter, setGeneroFilter] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
 
-  // Estados para criação de nova obra
+
   const [novoTitulo, setNovoTitulo] = useState("");
   const [novaDescricao, setNovaDescricao] = useState("");
   const [novoAutor, setNovoAutor] = useState("");
@@ -72,7 +72,7 @@ export function PesquisaScreen() {
     return tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase();
   };
 
-  // Função para adicionar uma nova obra usando a mutação do React Query
+ 
   const adicionarObra = () => {
     if (
       !novoTitulo ||
@@ -97,7 +97,7 @@ export function PesquisaScreen() {
 
     createObraMutation.mutate(novaObra, {
       onSuccess: () => {
-        // Fecha o modal e limpa os campos
+        
         setModalVisible(false);
         setNovoTitulo("");
         setNovaDescricao("");
@@ -112,7 +112,7 @@ export function PesquisaScreen() {
     });
   };
 
-  // Filtrando as obras com base nos estados dos filtros e da busca
+
   const filteredObras =
     obras?.filter((obra) => {
       const titulo = obra.titulo ?? "";
@@ -203,7 +203,7 @@ export function PesquisaScreen() {
         />
       )}
 
-      {/* Modal de Filtros */}
+
       <Modal
         visible={filterModalVisible}
         animationType="slide"
@@ -246,7 +246,7 @@ export function PesquisaScreen() {
         </TouchableWithoutFeedback>
       </Modal>
 
-      {/* Modal de Criação (Bottom Sheet) */}
+
       <ModalCustomizado
         isVisible={modalVisible}
         onClose={() => setModalVisible(false)}
