@@ -24,10 +24,12 @@ import { Tipo } from "@/src/types/enums";
 import { Obra } from "@/src/types/obra";
 import { useObras, useCreateObra } from "@/src/hooks/useObras";
 import ModalCustomizado from "@/src/components/ModalCustomizado";
-
+import { useQueryClient } from "@tanstack/react-query";
 export function PesquisaScreen() {
   
   const { data: obras, isLoading } = useObras();
+  const queryClient = useQueryClient();
+
 
   const createObraMutation = useCreateObra();
 
@@ -97,7 +99,8 @@ export function PesquisaScreen() {
 
     createObraMutation.mutate(novaObra, {
       onSuccess: () => {
-        
+        queryClient.invalidateQueries({ queryKey: ["obras"] }); 
+    
         setModalVisible(false);
         setNovoTitulo("");
         setNovaDescricao("");

@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useIsFocused } from '@react-navigation/native';
+import { useEffect } from 'react';
 import axios from 'axios';
 import { Obra } from '../types/obra';
 
@@ -7,46 +9,50 @@ const fetchObras = async (): Promise<Obra[]> => {
   return response.data;
 };
 
-
 const fetchObra = async (id: string): Promise<Obra> => {
   const response = await axios.get(`https://moonbookmarks-back.onrender.com/obras/${id}`);
   return response.data;
 };
-
 
 const addObra = async (novaObra: Omit<Obra, 'id'>): Promise<Obra> => {
   const response = await axios.post('https://moonbookmarks-back.onrender.com/obras', novaObra);
   return response.data;
 };
 
-
 const updateObra = async (id: string, obraAtualizada: Partial<Obra>): Promise<Obra> => {
   const response = await axios.put(`https://moonbookmarks-back.onrender.com/obras/${id}`, obraAtualizada);
   return response.data;
 };
 
-
 const deleteObra = async (id: string): Promise<void> => {
   await axios.delete(`https://moonbookmarks-back.onrender.com/obras/${id}`);
 };
 
-
 export const useObras = () => {
-  return useQuery<Obra[], Error>({
+  const isFocused = useIsFocused();
+
+  const query = useQuery<Obra[], Error>({
     queryKey: ['obras'],
     queryFn: fetchObras,
+    staleTime: 1000 * 60 * 5, // 5 minutos
   });
-};
 
+  useEffect(() => {
+    if (isFocused) {
+      query.refetch();
+    }
+  }, [isFocused]);
+
+  return query;
+};
 
 export const useObra = (id: string) => {
   return useQuery<Obra, Error>({
     queryKey: ['obra', id],
     queryFn: () => fetchObra(id),
-    enabled: !!id, 
+    enabled: !!id,
   });
 };
-
 
 export const useCreateObra = () => {
   const queryClient = useQueryClient();
@@ -59,7 +65,6 @@ export const useCreateObra = () => {
   });
 };
 
-
 export const useUpdateObra = () => {
   const queryClient = useQueryClient();
 
@@ -70,7 +75,6 @@ export const useUpdateObra = () => {
     },
   });
 };
-
 
 export const useDeleteObra = () => {
   const queryClient = useQueryClient();

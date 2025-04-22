@@ -1,25 +1,33 @@
-import React, { useState, useEffect } from "react";
-import { FlatList, TextInput, Text, View, Image, Pressable, ActivityIndicator, Modal, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import { FlatList, TextInput, Text, View, Image, Pressable, ActivityIndicator, Modal, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useBookmarks } from "../../../hooks/useBookmarks"; 
 import { Tipo, Status } from "../../../types/enums";
 import styles from "./bookmarks.styles";
 import Header from "@/src/components/Header";
+import { useFocusEffect } from "@react-navigation/native";
 
 export function BookmarksScreen() {
   const [filteredBookmarks, setFilteredBookmarks] = useState<any[]>([]);
   const [searchText, setSearchText] = useState(""); 
-  const [loading, setLoading] = useState(true);
   const [selectedType, setSelectedType] = useState<string | null>("Todos");
   const [selectedStatus, setSelectedStatus] = useState<string | null>("Todos");
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const router = useRouter();
   const tipos = Object.values(Tipo);
   const status = Object.values(Status);
-  const { data: bookmarks, isLoading, isError } = useBookmarks();
+
+  const { data: bookmarks, isLoading, isError, refetch } = useBookmarks();
 
 
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [])
+  );
+
+ 
   useEffect(() => {
     if (bookmarks) {
       let filtered = bookmarks;
@@ -85,8 +93,6 @@ export function BookmarksScreen() {
       </Pressable>
     );
   };
-  
-  
 
   if (isLoading) {
     return <ActivityIndicator size="large" color="#6200ee" />;
@@ -99,6 +105,7 @@ export function BookmarksScreen() {
   return (
     <View style={styles.container}>
       <Header/>
+      
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
         <TextInput
